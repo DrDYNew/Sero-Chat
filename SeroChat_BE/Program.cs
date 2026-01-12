@@ -59,9 +59,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Register HttpClient for GeminiService
 builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
+// Register HttpClientFactory for PayOSService
+builder.Services.AddHttpClient();
+
 // Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGeminiService, GeminiService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPayOSService, PayOSService>();
+builder.Services.AddScoped<IChatLimitService, ChatLimitService>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -106,7 +113,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Disabled for mobile development
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();

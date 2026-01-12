@@ -1,6 +1,8 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ENV from '../config/env';
 
-const API_BASE_URL = 'http://localhost:5000/api'; // Update với URL thực của bạn
+const API_BASE_URL = ENV.API_BASE_URL;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -11,12 +13,15 @@ const apiClient = axios.create({
 
 // Add token to requests if available
 apiClient.interceptors.request.use(
-  (config) => {
-    // TODO: Get token from AsyncStorage
-    // const token = await AsyncStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+  async (config) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+    }
     return config;
   },
   (error) => {
@@ -24,4 +29,5 @@ apiClient.interceptors.request.use(
   }
 );
 
+export { API_BASE_URL };
 export default apiClient;

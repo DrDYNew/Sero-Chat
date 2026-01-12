@@ -16,10 +16,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import BottomTabBar from '../components/BottomTabBar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { moodService } from '../services/moodService';
 import {
   getDailyAffirmation,
-  getLatestMood,
-  getConversationStats,
   getRelaxAssets,
   getFeaturedBlogs,
   getRecentActivities,
@@ -67,7 +66,6 @@ const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [dailyQuote, setDailyQuote] = useState<DailyAffirmation | null>(null);
   const [moodData, setMoodData] = useState<any>(null);
-  const [conversationStats, setConversationStats] = useState<any>(null);
   const [relaxAssets, setRelaxAssets] = useState<RelaxAsset[]>([]);
   const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
@@ -101,19 +99,15 @@ const HomeScreen = () => {
       }
 
       // Fetch personalized data in parallel
-      const [mood, stats, assets, activities] = await Promise.all([
-        getLatestMood(userId).catch(() => null),
-        getConversationStats(userId).catch(() => ({
-          totalConversations: 0,
-          todayConversations: 0,
-          streak: 0,
-        })),
+      const [moodStats, assets, activities] = await Promise.all([
+        moodService.getMoodStats().catch(() => null),
         getRelaxAssets().catch(() => []),
-        getRecentActivities(userId, 5).catch(() => []),
+        getRecentActivities(Number(userId), 5).catch(() => []),
       ]);
 
-      setMoodData(mood);
-      setConversationStats(stats);
+      if (moodStats?.success && moodStats.data) {
+        setMoodData(moodStats.data);
+      }
       setRelaxAssets(assets);
       setRecentActivities(activities);
     } catch (error) {
@@ -132,21 +126,21 @@ const HomeScreen = () => {
   // Get mood label from score
   const getMoodLabel = (score?: number) => {
     if (!score) return 'Chưa có';
-    if (score >= 8) return 'Rất tốt';
-    if (score >= 6) return 'Tốt';
-    if (score >= 4) return 'Bình thường';
-    if (score >= 2) return 'Không tốt';
-    return 'Rất tồi';
+    if (score === 5) return 'Rất tốt';
+    if (score === 4) return 'Tốt';
+    if (score === 3) return 'Bình thường';
+    if (score === 2) return 'Không tốt';
+    return 'Rất tệ';
   };
 
   // Get mood color from score
   const getMoodColor = (score?: number) => {
     if (!score) return '#999';
-    if (score >= 8) return '#4ECDC4';
-    if (score >= 6) return '#95E1D3';
-    if (score >= 4) return '#FFD93D';
-    if (score >= 2) return '#FF9A76';
-    return '#FF6B6B';
+    if (score === 5) return '#10B981';
+    if (score === 4) return '#3B82F6';
+    if (score === 3) return '#F59E0B';
+    if (score === 2) return '#EF4444';
+    return '#991B1B';
   };
 
   // Hardcoded quick tips
@@ -204,19 +198,13 @@ const HomeScreen = () => {
   const moodStats: MoodStat[] = [
     {
       label: 'Cảm xúc hôm nay',
-      value: getMoodLabel(moodData?.moodScore),
+      value: moodData?.latestMood ? getMoodLabel(moodData.latestMood.moodScore) : 'Chưa có',
       icon: 'emoticon-happy',
-      color: getMoodColor(moodData?.moodScore),
+      color: moodData?.latestMood ? getMoodColor(moodData.latestMood.moodScore) : '#999',
     },
     {
-      label: 'Cuộc trò chuyện',
-      value: conversationStats?.totalConversations?.toString() || '0',
-      icon: 'message-text',
-      color: '#667EEA',
-    },
-    {
-      label: 'Ngày liên tiếp',
-      value: conversationStats?.streak?.toString() || '0',
+      label: 'Ngày truy cập',
+      value: moodData?.streak?.toString() || '0',
       icon: 'fire',
       color: '#FF6B6B',
     },
@@ -273,6 +261,19 @@ const HomeScreen = () => {
   const handleBlogPress = (blog: Blog) => {
     console.log('Blog selected:', blog.title);
     // Navigate to blog detail
+  };
+
+  const handleSubscribePress = async (plan: any) => {
+    if (!user?.id) {
+      // Navigate to login if user is not logged in
+      navigation.navigate('Login');
+      return;
+    }
+    
+    console.log('Subscribe to plan:', plan.planName);
+    // TODO: Implement subscription logic
+    // This could navigate to a payment screen or show a confirmation modal
+    alert(`Đăng ký gói ${plan.planName}\nGiá: ${plan.price.toLocaleString('vi-VN')} VNĐ\nThời hạn: ${plan.durationDays} ngày`);
   };
 
   return (
@@ -881,6 +882,80 @@ const styles = StyleSheet.create({
   },
   selfCareArrow: {
     alignSelf: 'flex-start',
+  },
+  
+  // Subscription Plans
+  plansScroll: {
+    paddingRight: 20,
+  },
+  planCard: {
+    width: 280,
+    marginRight: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  planGradient: {
+    padding: 24,
+  },
+  planHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  planName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  planPriceContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  planPrice: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
+  planDuration: {
+    fontSize: 16,
+    color: '#FFF',
+    opacity: 0.9,
+    marginTop: 4,
+  },
+  planFeatures: {
+    marginBottom: 24,
+  },
+  planFeature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  planFeatureText: {
+    fontSize: 14,
+    color: '#FFF',
+    flex: 1,
+  },
+  planButton: {
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    gap: 8,
+  },
+  planButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#667EEA',
   },
   
   // Featured Blogs

@@ -53,11 +53,11 @@ const BottomTabBar = () => {
       route: 'Explore',
     },
     user?.id ? {
-      name: 'Profile',
+      name: 'Menu',
       icon: 'account-outline',
       iconActive: 'account',
       label: 'Hồ sơ',
-      route: 'Profile',
+      route: 'Menu',
       isProfile: true,
     } : {
       name: 'Login',
@@ -70,7 +70,7 @@ const BottomTabBar = () => {
 
   const handleTabPress = (tab: Tab) => {
     // Các trang đã làm
-    const availableScreens = ['Home', 'Login', 'Profile', 'Chats', 'Explore'];
+    const availableScreens = ['Home', 'Login', 'Menu', 'Chats', 'Explore'];
     
     if (availableScreens.includes(tab.route)) {
       navigation.navigate(tab.route);

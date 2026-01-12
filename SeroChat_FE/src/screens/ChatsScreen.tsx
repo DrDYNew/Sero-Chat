@@ -16,9 +16,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
-import { getGeminiResponse, checkInappropriateContent } from '../services/geminiService';
+import { chatService } from '../services/chatService';
+import ConversationsModal from '../components/ConversationsModal';
 
 interface Message {
   id: string;
@@ -29,6 +30,7 @@ interface Message {
 
 const ChatsScreen = () => {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
   const { user } = useAuth();
   const flatListRef = useRef<FlatList>(null);
 
@@ -43,18 +45,23 @@ const ChatsScreen = () => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [messageCount, setMessageCount] = useState(0);
+  const [dailyLimit, setDailyLimit] = useState(0);
   const [showCrisisModal, setShowCrisisModal] = useState(false);
+  const [showConversationsModal, setShowConversationsModal] = useState(false);
+  const [currentConvId, setCurrentConvId] = useState<number | undefined>();
+  const [currentConvTitle, setCurrentConvTitle] = useState<string>('SERO Chat');
   
-  const MAX_GUEST_MESSAGES = 100;
+  const GUEST_MESSAGE_LIMIT = 5;
   const isGuest = !user?.id;
-  const remainingMessages = isGuest ? MAX_GUEST_MESSAGES - messageCount : null;
 
-  // Load guest message count từ AsyncStorage khi mount
+  // Load message count and daily limit
   useEffect(() => {
     if (isGuest) {
       loadGuestMessageCount();
+    } else {
+      loadDailyLimit();
     }
-  }, [isGuest]);
+  }, [isGuest, user]);
 
   // Scroll to bottom when new message added
   useEffect(() => {
@@ -64,6 +71,54 @@ const ChatsScreen = () => {
       }, 100);
     }
   }, [messages]);
+
+  // Load conversation if navigated from history
+  useEffect(() => {
+    const loadConversationFromParams = async () => {
+      const conversationId = route.params?.conversationId;
+      const conversationTitle = route.params?.conversationTitle;
+      
+      if (conversationId && !isGuest) {
+        try {
+          setIsLoading(true);
+          const response = await chatService.getConversationDetail(conversationId);
+          
+          if (response.success && response.data) {
+            const loadedMessages: Message[] = response.data.messages.map((msg, index) => ({
+              id: (Date.now() + index).toString(),
+              text: msg.content,
+              sender: msg.senderType.toLowerCase() === 'user' ? 'user' : 'ai',
+              timestamp: new Date(msg.sentAt),
+            }));
+
+            setMessages(loadedMessages);
+            setCurrentConvId(conversationId);
+            setCurrentConvTitle(conversationTitle || response.data.title);
+          }
+        } catch (error) {
+          console.error('Error loading conversation:', error);
+          Alert.alert('Lỗi', 'Không thể tải cuộc trò chuyện');
+        } finally {
+          setIsLoading(false);
+        }
+        
+        // Clear params after loading
+        navigation.setParams({ conversationId: undefined, conversationTitle: undefined });
+      }
+    };
+
+    loadConversationFromParams();
+  }, [route.params?.conversationId, isGuest]);
+
+  const loadDailyLimit = async () => {
+    try {
+      const data = await chatService.getDailyLimit();
+      setDailyLimit(data.dailyLimit);
+      setMessageCount(data.messagesSentToday);
+    } catch (error) {
+      console.error('Error loading daily limit:', error);
+    }
+  };
 
   const loadGuestMessageCount = async () => {
     try {
@@ -106,17 +161,73 @@ const ChatsScreen = () => {
     }
   };
 
+  // Handle selecting a conversation from history
+  const handleSelectConversation = async (convId: number, title: string) => {
+    try {
+      setIsLoading(true);
+      const response = await chatService.getConversationDetail(convId);
+      
+      if (response.success && response.data) {
+        // Convert Messages to local Message format
+        const loadedMessages: Message[] = response.data.messages.map((msg, index) => ({
+          id: (Date.now() + index).toString(),
+          text: msg.content,
+          sender: msg.senderType.toLowerCase() === 'user' ? 'user' : 'ai',
+          timestamp: new Date(msg.sentAt),
+        }));
+
+        setMessages(loadedMessages);
+        setCurrentConvId(response.data.convId);
+        setCurrentConvTitle(title);
+      }
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+      Alert.alert('Lỗi', 'Không thể tải lịch sử chat');
+    } finally {
+      setIsLoading(false);
+      setShowConversationsModal(false);
+    }
+  };
+
+  // Handle creating a new conversation
+  const handleNewConversation = () => {
+    setMessages([
+      {
+        id: '0',
+        text: 'Xin chào! Mình là SERO, trợ lý tâm lý AI của bạn. 💙\n\nMình ở đây để lắng nghe và hỗ trợ bạn. Bạn muốn chia sẻ điều gì với mình?',
+        sender: 'ai',
+        timestamp: new Date(),
+      },
+    ]);
+    setCurrentConvId(undefined);
+    setCurrentConvTitle('SERO Chat');
+    setShowConversationsModal(false);
+  };
+
   const sendMessage = async () => {
     if (!inputText.trim()) return;
 
     // Check guest limit
-    if (isGuest && messageCount >= MAX_GUEST_MESSAGES) {
+    if (isGuest && messageCount >= GUEST_MESSAGE_LIMIT) {
       Alert.alert(
         'Đã hết lượt trò chuyện miễn phí',
-        'Bạn đã sử dụng hết 100 tin nhắn miễn phí trong ngày. Đăng nhập để tiếp tục trò chuyện không giới hạn!',
+        `Bạn đã sử dụng hết ${GUEST_MESSAGE_LIMIT} lượt chat miễn phí. Đăng nhập để tiếp tục với 30 lượt/ngày!`,
         [
           { text: 'Để sau', style: 'cancel' },
           { text: 'Đăng nhập ngay', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+
+    // Check logged-in user limit  
+    if (!isGuest && dailyLimit > 0 && messageCount >= dailyLimit) {
+      Alert.alert(
+        'Đã hết lượt chat',
+        `Bạn đã sử dụng hết ${dailyLimit} lượt chat trong ngày. Mua gói dịch vụ để tăng số lượt chat!`,
+        [
+          { text: 'Để sau', style: 'cancel' },
+          { text: 'Xem gói dịch vụ', onPress: () => navigation.navigate('SubscriptionPlans') },
         ]
       );
       return;
@@ -133,16 +244,70 @@ const ChatsScreen = () => {
     setInputText('');
     setIsLoading(true);
     
-    // Tăng và lưu message count cho guest
-    const newCount = messageCount + 1;
-    setMessageCount(newCount);
+    // Increment count for guest
     if (isGuest) {
+      const newCount = messageCount + 1;
+      setMessageCount(newCount);
       await saveGuestMessageCount(newCount);
     }
 
     try {
-      // Call AI API
-      const aiResponse = await getAIResponse(userMessage.text);
+      let aiResponse: string;
+      let remaining = 0;
+
+      if (isGuest) {
+        // Guest users: use old gemini service (no backend auth needed)
+        const { getGeminiResponse } = await import('../services/geminiService');
+        const { response, isCrisis } = await getGeminiResponse(userMessage.text, undefined);
+        aiResponse = response;
+        remaining = GUEST_MESSAGE_LIMIT - (messageCount + 1);
+        
+        if (isCrisis) {
+          setShowCrisisModal(true);
+        }
+      } else {
+        // Logged-in users: Create conversation if needed, then send message
+        let convId = currentConvId;
+        
+        // If no current conversation, create new one
+        if (!convId) {
+          const createResponse = await chatService.createConversation(userMessage.text);
+          if (createResponse.success && createResponse.data) {
+            convId = createResponse.data.convId;
+            setCurrentConvId(convId);
+            setCurrentConvTitle(createResponse.data.title);
+          } else {
+            throw new Error('Failed to create conversation');
+          }
+        }
+
+        // Send message to conversation
+        const response = await chatService.sendMessageToConversation({
+          convId: convId,
+          message: userMessage.text
+        });
+        
+        if (!response.success) {
+          // Limit exceeded or error
+          Alert.alert(
+            'Đã hết lượt chat',
+            response.error || 'Bạn đã hết lượt chat trong ngày',
+            [
+              { text: 'Để sau', style: 'cancel' },
+              { text: 'Xem gói dịch vụ', onPress: () => navigation.navigate('SubscriptionPlans') },
+            ]
+          );
+          return;
+        }
+
+        aiResponse = response.response;
+        remaining = response.remainingMessages || 0;
+        setMessageCount(dailyLimit - remaining);
+
+        if (response.isCrisisDetected) {
+          setShowCrisisModal(true);
+        }
+      }
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -164,24 +329,6 @@ const ChatsScreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getAIResponse = async (userMessage: string): Promise<string> => {
-    // Check for inappropriate questions
-    const isInappropriate = await checkInappropriateContent(userMessage);
-    if (isInappropriate) {
-      return 'Xin lỗi bạn, mình chỉ có thể hỗ trợ về các vấn đề tâm lý và sức khỏe tinh thần. Nếu bạn có lo lắng hay căng thẳng gì, hãy chia sẻ với mình nhé! 💙';
-    }
-
-    // Call Gemini AI via backend
-    const { response: aiResponse, isCrisis } = await getGeminiResponse(userMessage, user?.id);
-    
-    // Nếu phát hiện khủng hoảng, hiển thị modal
-    if (isCrisis) {
-      setShowCrisisModal(true);
-    }
-    
-    return aiResponse;
   };
 
   const renderMessage = ({ item }: { item: Message }) => {
@@ -293,23 +440,41 @@ const ChatsScreen = () => {
             <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>SERO Chat</Text>
+            <Text style={styles.headerTitle}>{currentConvTitle}</Text>
             <Text style={styles.headerSubtitle}>Trợ lý tâm lý AI</Text>
           </View>
-          <TouchableOpacity style={styles.menuButton}>
-            <MaterialCommunityIcons name="dots-vertical" size={24} color="#333" />
+          <TouchableOpacity 
+            style={styles.menuButton}
+            onPress={() => !isGuest && setShowConversationsModal(true)}
+            disabled={isGuest}
+          >
+            <MaterialCommunityIcons 
+              name="dots-vertical" 
+              size={24} 
+              color={isGuest ? "#CCC" : "#333"} 
+            />
           </TouchableOpacity>
         </View>
 
-        {/* Guest Warning Banner */}
-        {isGuest && (
+        {/* Guest/User Info Banner */}
+        {isGuest ? (
           <View style={styles.guestBanner}>
             <MaterialCommunityIcons name="information" size={20} color="#FF9800" />
             <Text style={styles.guestBannerText}>
-              Bạn còn {remainingMessages} tin nhắn miễn phí
+              Bạn còn {GUEST_MESSAGE_LIMIT - messageCount} tin nhắn miễn phí
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.loginLink}>Đăng nhập</Text>
+            </TouchableOpacity>
+          </View>
+        ) : dailyLimit > 0 && (
+          <View style={styles.guestBanner}>
+            <MaterialCommunityIcons name="chat-processing" size={20} color="#667EEA" />
+            <Text style={styles.guestBannerText}>
+              Còn {dailyLimit - messageCount}/{dailyLimit} lượt chat hôm nay
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('SubscriptionPlans')}>
+              <Text style={styles.loginLink}>Nâng cấp</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -357,6 +522,15 @@ const ChatsScreen = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Conversations Modal */}
+      <ConversationsModal
+        visible={showConversationsModal && !isGuest}
+        onClose={() => setShowConversationsModal(false)}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        currentConvId={currentConvId}
+      />
     </SafeAreaView>
   );
 };

@@ -6,4 +6,5 @@ public class ChatMessageResponseDto
     public bool Success { get; set; }
     public string? Error { get; set; }
     public bool IsCrisisDetected { get; set; } = false;
+    public int? RemainingMessages { get; set; }
 }

@@ -1,37 +1,83 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
   id?: string;
   username?: string;
   fullName?: string;
   email?: string;
+  avatarUrl?: string;
+  role?: string;
+  subscriptionStatus?: string;
+  premiumExpiry?: string;
 }
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean;
   login: (userData: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export { AuthContext };
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load user data khi app khởi động
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      const userData = await AsyncStorage.getItem('userData');
+      
+      if (token && userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser({
+          id: parsedUser.userId?.toString(),
+          email: parsedUser.email,
+          fullName: parsedUser.fullName,
+          username: parsedUser.fullName,
+          avatarUrl: parsedUser.avatarUrl,
+          role: parsedUser.role,
+          subscriptionStatus: parsedUser.subscriptionStatus,
+          premiumExpiry: parsedUser.premiumExpiry,
+        });
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.log('Error loading user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = (userData: User) => {
     setUser(userData);
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('userData');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.log('Error during logout:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

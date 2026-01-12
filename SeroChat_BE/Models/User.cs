@@ -31,6 +31,10 @@ public partial class User
 
     public DateTime? PremiumExpiry { get; set; }
 
+    public int MessagesSentToday { get; set; }
+
+    public DateTime? LastMessageResetDate { get; set; }
+
     public string? Theme { get; set; }
 
     public string? Language { get; set; }

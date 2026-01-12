@@ -441,6 +441,27 @@ public partial class SeroChatContext : DbContext
                 .HasDefaultValue("PENDING")
                 .HasColumnName("status");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.PaymentMethod)
+                .HasMaxLength(50)
+                .HasColumnName("payment_method");
+            entity.Property(e => e.PaymentStatus)
+                .HasMaxLength(50)
+                .HasColumnName("payment_status");
+            entity.Property(e => e.TransactionDate)
+                .HasColumnType("datetime")
+                .HasColumnName("transaction_date");
+            entity.Property(e => e.StartDate)
+                .HasColumnType("datetime")
+                .HasColumnName("start_date");
+            entity.Property(e => e.EndDate)
+                .HasColumnType("datetime")
+                .HasColumnName("end_date");
+            entity.Property(e => e.PayOSTransactionId)
+                .HasMaxLength(100)
+                .HasColumnName("payos_transaction_id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
 
             entity.HasOne(d => d.Plan).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.PlanId)
@@ -500,6 +521,12 @@ public partial class SeroChatContext : DbContext
             entity.Property(e => e.PremiumExpiry)
                 .HasColumnType("datetime")
                 .HasColumnName("premium_expiry");
+            entity.Property(e => e.MessagesSentToday)
+                .HasDefaultValue(0)
+                .HasColumnName("messages_sent_today");
+            entity.Property(e => e.LastMessageResetDate)
+                .HasColumnType("datetime")
+                .HasColumnName("last_message_reset_date");
             entity.Property(e => e.Role)
                 .HasMaxLength(20)
                 .HasDefaultValue("USER")

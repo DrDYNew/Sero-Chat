@@ -13,11 +13,19 @@ namespace SeroChat_BE.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(IUserRepository userRepository, IConfiguration configuration)
+        public AuthService(
+            IUserRepository userRepository, 
+            IConfiguration configuration,
+            IEmailService emailService,
+            ILogger<AuthService> logger)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
@@ -42,14 +50,15 @@ namespace SeroChat_BE.Services
             }
 
             // Kiểm tra tài khoản có bị khóa không
-            if (user.Status == "SUSPENDED")
-            {
-                throw new UnauthorizedAccessException("Tài khoản của bạn đã bị tạm khóa");
-            }
-
             if (user.Status == "INACTIVE")
             {
-                throw new UnauthorizedAccessException("Tài khoản của bạn chưa được kích hoạt");
+                throw new UnauthorizedAccessException("Tài khoản của bạn đã bị khóa bởi quản trị viên");
+            }
+
+            // Kiểm tra tài khoản đã xác thực email chưa
+            if (user.IsVerify == false)
+            {
+                throw new UnauthorizedAccessException("Tài khoản của bạn chưa được xác thực email. Vui lòng kiểm tra email để kích hoạt tài khoản");
             }
 
             // Tạo JWT token
@@ -98,6 +107,25 @@ namespace SeroChat_BE.Services
             };
 
             var createdUser = await _userRepository.CreateAsync(newUser);
+
+            // Tạo verification token
+            var verificationToken = GenerateVerificationToken(createdUser.UserId, createdUser.Email);
+
+            // Gửi email xác thực
+            try
+            {
+                await _emailService.SendVerificationEmailAsync(
+                    createdUser.Email, 
+                    createdUser.FullName ?? "Bạn", 
+                    verificationToken
+                );
+                _logger.LogInformation("Verification email sent to {Email}", createdUser.Email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send verification email to {Email}", createdUser.Email);
+                // Không throw exception, cho phép đăng ký thành công nhưng log lỗi
+            }
 
             // Tạo JWT token
             var token = GenerateJwtToken(createdUser.UserId, createdUser.Email, createdUser.Role ?? "USER");
@@ -153,6 +181,108 @@ namespace SeroChat_BE.Services
         public string HashPassword(string password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public string GenerateVerificationToken(int userId, string email)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+            var issuer = jwtSettings["Issuer"] ?? "SeroChat";
+            var audience = jwtSettings["Audience"] ?? "SeroChat";
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim("userId", userId.ToString()),
+                new Claim("email", email),
+                new Claim("purpose", "email_verification"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(24), // Token hết hạn sau 24h
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<bool> VerifyEmailAsync(string token)
+        {
+            try
+            {
+                var jwtSettings = _configuration.GetSection("JwtSettings");
+                var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+                var issuer = jwtSettings["Issuer"] ?? "SeroChat";
+                var audience = jwtSettings["Audience"] ?? "SeroChat";
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                
+                var purposeClaim = principal.FindFirst("purpose")?.Value;
+                if (purposeClaim != "email_verification")
+                {
+                    throw new UnauthorizedAccessException("Token không hợp lệ");
+                }
+
+                var userIdClaim = principal.FindFirst("userId")?.Value;
+                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+                {
+                    throw new UnauthorizedAccessException("Token không hợp lệ");
+                }
+
+                var user = await _userRepository.GetByIdAsync(userId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("Người dùng không tồn tại");
+                }
+
+                if (user.IsVerify == true)
+                {
+                    return true; // Đã verify rồi
+                }
+
+                // Cập nhật IsVerify = true
+                user.IsVerify = true;
+                await _userRepository.UpdateAsync(user);
+
+                // Gửi email chào mừng
+                try
+                {
+                    await _emailService.SendWelcomeEmailAsync(user.Email, user.FullName ?? "Bạn");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send welcome email to {Email}", user.Email);
+                }
+
+                return true;
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new UnauthorizedAccessException("Token đã hết hạn");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error verifying email token");
+                throw new UnauthorizedAccessException("Token không hợp lệ");
+            }
         }
     }
 }

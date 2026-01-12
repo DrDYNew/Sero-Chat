@@ -18,8 +18,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/authService';
 import { LoginRequest } from '../types/auth.types';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginScreen({ navigation }: any) {
+  const { login: setAuthLogin } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -94,11 +96,23 @@ export default function LoginScreen({ navigation }: any) {
           await AsyncStorage.removeItem('rememberMe');
         }
 
-        Alert.alert(
-          '✅ Thành công',
-          'Đăng nhập thành công!',
-          [{ text: 'OK' }]
-        );
+        // Cập nhật AuthContext
+        setAuthLogin({
+          id: response.data.userId.toString(),
+          email: response.data.email,
+          fullName: response.data.fullName,
+          username: response.data.fullName,
+          role: response.data.role,
+          avatarUrl: response.data.avatarUrl,
+          subscriptionStatus: response.data.subscriptionStatus,
+        });
+
+        // Điều hướng dựa trên role
+        if (response.data.role === 'ADMIN') {
+          navigation.replace('AdminDashboard');
+        } else {
+          navigation.replace('Home');
+        }
       } else {
         const errorMsg = response.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
         setError(errorMsg);
@@ -290,9 +304,7 @@ export default function LoginScreen({ navigation }: any) {
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Chưa có tài khoản? </Text>
             <TouchableOpacity 
-              onPress={() => {
-                Alert.alert('Thông báo', 'Chức năng đăng ký đang được phát triển');
-              }}
+              onPress={() => navigation.navigate('Register')}
               disabled={loading}
             >
               <Text style={styles.registerLink}>Đăng ký ngay</Text>

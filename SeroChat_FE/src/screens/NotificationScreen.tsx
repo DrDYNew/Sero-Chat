@@ -13,9 +13,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { notificationService, Notification } from '../services/notificationService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const NotificationScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -157,7 +159,11 @@ const NotificationScreen = ({ navigation }: any) => {
 
     return (
       <TouchableOpacity
-        style={[styles.notificationCard, !item.isRead && styles.unreadCard]}
+        style={[
+          styles.notificationCard,
+          { backgroundColor: colors.card, borderColor: isDarkMode ? '#374151' : '#E5E7EB' },
+          !item.isRead && [styles.unreadCard, { backgroundColor: isDarkMode ? '#2D1B4E' : '#F5F3FF', borderColor: isDarkMode ? '#6B21A8' : '#DDD6FE' }]
+        ]}
         onPress={() => handleMarkAsRead(item.notificationId)}
         onLongPress={() => handleDeleteNotification(item.notificationId)}
       >
@@ -167,22 +173,22 @@ const NotificationScreen = ({ navigation }: any) => {
 
         <View style={styles.notificationContent}>
           <View style={styles.notificationHeader}>
-            <Text style={[styles.notificationTitle, !item.isRead && styles.unreadTitle]}>
+            <Text style={[styles.notificationTitle, { color: colors.text }, !item.isRead && [styles.unreadTitle, { color: colors.primary }]]}>
               {item.title}
             </Text>
-            {!item.isRead && <View style={styles.unreadDot} />}
+            {!item.isRead && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
           </View>
-          <Text style={styles.notificationMessage} numberOfLines={2}>
+          <Text style={[styles.notificationMessage, { color: colors.textSecondary }]} numberOfLines={2}>
             {item.content}
           </Text>
-          <Text style={styles.notificationTime}>{formatTime(item.createdAt)}</Text>
+          <Text style={[styles.notificationTime, { color: colors.textSecondary }]}>{formatTime(item.createdAt)}</Text>
         </View>
 
         <TouchableOpacity
           style={styles.deleteButton}
           onPress={() => handleDeleteNotification(item.notificationId)}
         >
-          <MaterialCommunityIcons name="close" size={20} color="#9CA3AF" />
+          <MaterialCommunityIcons name="close" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -190,46 +196,54 @@ const NotificationScreen = ({ navigation }: any) => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="bell-outline" size={80} color="#D1D5DB" />
-      <Text style={styles.emptyTitle}>Chưa có thông báo</Text>
-      <Text style={styles.emptySubtitle}>
+      <MaterialCommunityIcons name="bell-outline" size={80} color={colors.textSecondary} />
+      <Text style={[styles.emptyTitle, { color: colors.textSecondary }]}>Chưa có thông báo</Text>
+      <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
         Thông báo của bạn sẽ xuất hiện ở đây
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thông báo</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Thông báo</Text>
         <TouchableOpacity onPress={handleDeleteAll}>
           <MaterialCommunityIcons name="delete-outline" size={24} color="#EF4444" />
         </TouchableOpacity>
       </View>
 
       {/* Filter & Actions */}
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
         <View style={styles.filterButtons}>
           <TouchableOpacity
-            style={[styles.filterButton, filter === 'all' && styles.filterButtonActive]}
+            style={[
+              styles.filterButton,
+              { backgroundColor: isDarkMode ? '#374151' : '#F3F4F6' },
+              filter === 'all' && [styles.filterButtonActive, { backgroundColor: colors.primary }]
+            ]}
             onPress={() => setFilter('all')}
           >
             <Text
-              style={[styles.filterText, filter === 'all' && styles.filterTextActive]}
+              style={[styles.filterText, { color: colors.textSecondary }, filter === 'all' && styles.filterTextActive]}
             >
               Tất cả
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.filterButton, filter === 'unread' && styles.filterButtonActive]}
+            style={[
+              styles.filterButton,
+              { backgroundColor: isDarkMode ? '#374151' : '#F3F4F6' },
+              filter === 'unread' && [styles.filterButtonActive, { backgroundColor: colors.primary }]
+            ]}
             onPress={() => setFilter('unread')}
           >
             <Text
-              style={[styles.filterText, filter === 'unread' && styles.filterTextActive]}
+              style={[styles.filterText, { color: colors.textSecondary }, filter === 'unread' && styles.filterTextActive]}
             >
               Chưa đọc
             </Text>
@@ -237,8 +251,8 @@ const NotificationScreen = ({ navigation }: any) => {
         </View>
 
         <TouchableOpacity style={styles.markAllButton} onPress={handleMarkAllAsRead}>
-          <MaterialCommunityIcons name="check-all" size={18} color="#8B5CF6" />
-          <Text style={styles.markAllText}>Đánh dấu tất cả</Text>
+          <MaterialCommunityIcons name="check-all" size={18} color={colors.primary} />
+          <Text style={[styles.markAllText, { color: colors.primary }]}>Đánh dấu tất cả</Text>
         </TouchableOpacity>
       </View>
 
@@ -252,7 +266,7 @@ const NotificationScreen = ({ navigation }: any) => {
           notifications.length === 0 && styles.emptyListContainer,
         ]}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#8B5CF6']} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />
         }
         ListEmptyComponent={!loading ? renderEmptyState : null}
         showsVerticalScrollIndicator={false}

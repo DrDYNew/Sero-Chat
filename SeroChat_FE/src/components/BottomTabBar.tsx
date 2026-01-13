@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Svg, { Path } from 'react-native-svg';
 
 interface Tab {
@@ -20,6 +21,7 @@ const BottomTabBar = () => {
   const navigation = useNavigation<any>();
   const route = useRoute();
   const { isAuthenticated, user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const currentRoute = route.name;
 
   const tabs: Tab[] = [
@@ -93,7 +95,7 @@ const BottomTabBar = () => {
       >
         <Path
           d="M0,0 L0,85 L375,85 L375,0 L235,0 Q225,0 215,10 Q200,25 187.5,25 Q175,25 160,10 Q150,0 140,0 Z"
-          fill="#FFFFFF"
+          fill={colors.card}
         />
       </Svg>
       
@@ -113,7 +115,7 @@ const BottomTabBar = () => {
               activeOpacity={0.8}
             >
               <View style={styles.fab}>
-                <View style={styles.fabInner}>
+                <View style={[styles.fabInner, { backgroundColor: colors.primary }]}>
                   <MaterialCommunityIcons
                     name="chat-plus"
                     size={28}
@@ -121,7 +123,7 @@ const BottomTabBar = () => {
                   />
                 </View>
               </View>
-              <Text style={styles.fabLabel} numberOfLines={1} adjustsFontSizeToFit>{tab.label}</Text>
+              <Text style={[styles.fabLabel, { color: colors.primary }]} numberOfLines={1} adjustsFontSizeToFit>{tab.label}</Text>
             </TouchableOpacity>
           );
         }
@@ -135,17 +137,28 @@ const BottomTabBar = () => {
           >
             <View style={styles.iconContainer}>
               {tab.isProfile && user ? (
-                <View style={[styles.avatar, isActive && styles.avatarActive]}>
-                  <Text style={[styles.avatarText, isActive && styles.avatarTextActive]}>
+                <View style={[
+                  styles.avatar, 
+                  { backgroundColor: isDarkMode ? colors.border : '#E5E5EA' },
+                  isActive && { backgroundColor: isDarkMode ? colors.primary + '30' : '#E8F1FF' }
+                ]}>
+                  <Text style={[
+                    styles.avatarText, 
+                    { color: isDarkMode ? colors.text : '#8E8E93' },
+                    isActive && { color: colors.primary }
+                  ]}>
                     {user?.fullName?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
                   </Text>
                 </View>
               ) : (
-                <View style={[styles.iconWrapper, isActive && styles.iconWrapperActive]}>
+                <View style={[
+                  styles.iconWrapper, 
+                  isActive && { backgroundColor: isDarkMode ? colors.primary + '30' : '#E8F1FF' }
+                ]}>
                   <MaterialCommunityIcons
                     name={(isActive ? tab.iconActive : tab.icon) as any}
                     size={22}
-                    color={isActive ? '#667EEA' : '#8E8E93'}
+                    color={isActive ? colors.primary : colors.textSecondary}
                   />
 
                 </View>
@@ -153,14 +166,18 @@ const BottomTabBar = () => {
               
               {/* Badge */}
               {tab.badge && tab.badge > 0 && (
-                <View style={styles.badge}>
+                <View style={[styles.badge, { borderColor: colors.card }]}>
                   <Text style={styles.badgeText}>{tab.badge}</Text>
                 </View>
               )}
             </View>
             
             {/* Label */}
-            <Text style={[styles.tabLabel, isActive && styles.tabLabelActive]}>
+            <Text style={[
+              styles.tabLabel, 
+              { color: colors.textSecondary },
+              isActive && { color: colors.primary, fontWeight: '600' }
+            ]}>
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -214,18 +231,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'transparent',
   },
-  iconWrapperActive: {
-    backgroundColor: '#E8F1FF',
-  },
   tabLabel: {
     fontSize: 10,
-    color: '#8E8E93',
     marginTop: 0,
     fontWeight: '500',
-  },
-  tabLabelActive: {
-    color: '#667EEA',
-    fontWeight: '600',
   },
   fabContainer: {
     flex: 1,
@@ -249,7 +258,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#667EEA',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#667EEA',
@@ -260,7 +268,6 @@ const styles = StyleSheet.create({
   },
   fabLabel: {
     fontSize: 9,
-    color: '#667EEA',
     marginTop: 4,
     fontWeight: '600',
     textAlign: 'center',
@@ -278,7 +285,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
   },
   badgeText: {
     color: '#FFFFFF',
@@ -289,20 +295,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#E5E5EA',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  avatarActive: {
-    backgroundColor: '#E8F1FF',
-  },
   avatarText: {
-    color: '#8E8E93',
     fontSize: 14,
     fontWeight: '600',
-  },
-  avatarTextActive: {
-    color: '#667EEA',
   },
 });
 

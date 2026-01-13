@@ -10,10 +10,12 @@ import {
   StatusBar,
   ActivityIndicator,
   RefreshControl,
+  Switch,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import BottomTabBar from '../components/BottomTabBar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { moodService } from '../services/moodService';
@@ -61,6 +63,7 @@ interface MoodStat {
 const HomeScreen = () => {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
+  const { isDarkMode, toggleDarkMode, colors } = useTheme();
   
   // State for API data
   const [loading, setLoading] = useState(true);
@@ -294,13 +297,16 @@ const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar 
+        barStyle={isDarkMode ? "light-content" : "dark-content"} 
+        backgroundColor={colors.background} 
+      />
       
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
-          <Text style={styles.loadingText}>Đang tải...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
         </View>
       ) : (
         <ScrollView 
@@ -311,27 +317,39 @@ const HomeScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#667EEA']}
-              tintColor="#667EEA"
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
           }
         >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.greeting}>
+            <Text style={[styles.greeting, { color: colors.text }]}>
               Chào {user?.fullName?.split(' ')[0] || 'bạn'} 👋
             </Text>
-            <Text style={styles.subGreeting}>
+            <Text style={[styles.subGreeting, { color: colors.textSecondary }]}>
               Hôm nay bạn cảm thấy thế nào?
             </Text>
           </View>
           <View style={styles.headerRight}>
+            {/* Dark Mode Toggle */}
             <TouchableOpacity 
-              style={styles.iconButton}
+              style={[styles.iconButton, { backgroundColor: colors.card }]}
+              onPress={toggleDarkMode}
+            >
+              <MaterialCommunityIcons 
+                name={isDarkMode ? "weather-night" : "white-balance-sunny"} 
+                size={24} 
+                color={isDarkMode ? "#FDB813" : "#FF9500"} 
+              />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.iconButton, { backgroundColor: colors.card }]}
               onPress={() => navigation.navigate('Notification')}
             >
-              <MaterialCommunityIcons name="bell-outline" size={24} color="#333" />
+              <MaterialCommunityIcons name="bell-outline" size={24} color={colors.text} />
               {unreadCount > 0 && (
                 <View style={styles.notificationBadge}>
                   <Text style={styles.notificationBadgeText}>
@@ -346,32 +364,32 @@ const HomeScreen = () => {
         {/* Mood Stats */}
         <View style={styles.statsContainer}>
           {moodStats.map((stat, index) => (
-            <View key={index} style={styles.statCard}>
+            <View key={index} style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={[styles.statIcon, { backgroundColor: stat.color + '20' }]}>
                 <MaterialCommunityIcons name={stat.icon as any} size={24} color={stat.color} />
               </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
             </View>
           ))}
         </View>
 
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          <View style={styles.heroImageContainer}>
+          <View style={[styles.heroImageContainer, { backgroundColor: isDarkMode ? colors.card : '#F0F4FF' }]}>
             <MaterialCommunityIcons 
               name="emoticon-happy-outline" 
               size={120} 
-              color="#667EEA" 
+              color={colors.primary} 
               style={styles.heroIcon}
             />
           </View>
           
-          <Text style={styles.heroTitle}>
+          <Text style={[styles.heroTitle, { color: colors.text }]}>
             Đừng giữ trong lòng,{'\n'}hãy chia sẻ để nhẹ gánh lo
           </Text>
           
-          <Text style={styles.heroSubtitle}>
+          <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
             Sero ở đây để lắng nghe bạn
           </Text>
 
@@ -395,7 +413,7 @@ const HomeScreen = () => {
 
         {/* Quick Start Options */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Bạn muốn chia sẻ về điều gì?
           </Text>
           
@@ -430,8 +448,8 @@ const HomeScreen = () => {
         {/* Self-care Corner */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="spa" size={24} color="#667EEA" />
-            <Text style={styles.sectionTitle}>Góc nhỏ bình yên cho bạn</Text>
+            <MaterialCommunityIcons name="spa" size={24} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Đại sảnh bình yên cho bạn</Text>
           </View>
           
           <ScrollView 
@@ -442,7 +460,7 @@ const HomeScreen = () => {
             {selfCareItems.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={styles.selfCareCard}
+                style={[styles.selfCareCard, { backgroundColor: colors.card }]}
                 onPress={() => handleSelfCarePress(item)}
                 activeOpacity={0.8}
               >
@@ -453,10 +471,10 @@ const HomeScreen = () => {
                     color="#FFF" 
                   />
                 </View>
-                <Text style={styles.selfCareTitle}>{item.title}</Text>
-                <Text style={styles.selfCareDescription}>{item.description}</Text>
+                <Text style={[styles.selfCareTitle, { color: colors.text }]}>{item.title}</Text>
+                <Text style={[styles.selfCareDescription, { color: colors.textSecondary }]}>{item.description}</Text>
                 <View style={styles.selfCareArrow}>
-                  <MaterialCommunityIcons name="arrow-right" size={20} color="#667EEA" />
+                  <MaterialCommunityIcons name="arrow-right" size={20} color={colors.primary} />
                 </View>
               </TouchableOpacity>
             ))}
@@ -467,8 +485,8 @@ const HomeScreen = () => {
         {featuredBlogs.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <MaterialCommunityIcons name="book-open-variant" size={24} color="#667EEA" />
-              <Text style={styles.sectionTitle}>Bài viết nổi bật</Text>
+              <MaterialCommunityIcons name="book-open-variant" size={24} color={colors.primary} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Bài viết nổi bật</Text>
             </View>
             
             <ScrollView 
@@ -479,7 +497,7 @@ const HomeScreen = () => {
               {featuredBlogs.map((blog) => (
                 <TouchableOpacity
                   key={blog.blogId}
-                  style={styles.blogCard}
+                  style={[styles.blogCard, { backgroundColor: colors.card }]}
                   onPress={() => handleBlogPress(blog)}
                   activeOpacity={0.8}
                 >
@@ -495,16 +513,16 @@ const HomeScreen = () => {
                         <MaterialCommunityIcons name="image" size={40} color="#CCC" />
                       </View>
                     )}
-                    <View style={styles.blogCategoryBadge}>
+                    <View style={[styles.blogCategoryBadge, { backgroundColor: colors.primary }]}>
                       <Text style={styles.blogCategoryText}>{blog.categoryName || 'Chung'}</Text>
                     </View>
                   </View>
                   <View style={styles.blogContent}>
-                    <Text style={styles.blogTitle} numberOfLines={2}>{blog.title}</Text>
-                    <Text style={styles.blogSummary} numberOfLines={2}>{blog.summary || 'Khám phá những kiến thức hữu ích...'}</Text>
+                    <Text style={[styles.blogTitle, { color: colors.text }]} numberOfLines={2}>{blog.title}</Text>
+                    <Text style={[styles.blogSummary, { color: colors.textSecondary }]} numberOfLines={2}>{blog.summary || 'Khám phá những kiến thức hữu ích...'}</Text>
                     <View style={styles.blogMeta}>
-                      <MaterialCommunityIcons name="clock-outline" size={14} color="#999" />
-                      <Text style={styles.blogReadTime}>{blog.readTime || '5 phút đọc'}</Text>
+                      <MaterialCommunityIcons name="clock-outline" size={14} color={colors.textSecondary} />
+                      <Text style={[styles.blogReadTime, { color: colors.textSecondary }]}>{blog.readTime || '5 phút đọc'}</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -517,15 +535,15 @@ const HomeScreen = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="lightbulb-on" size={24} color="#FFB300" />
-            <Text style={styles.sectionTitle}>Mẹo nhanh cho bạn</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Mẹo nhanh cho bạn</Text>
           </View>
           
           {quickTips.map((tip) => (
-            <View key={tip.id} style={styles.tipCard}>
-              <View style={styles.tipIconContainer}>
-                <MaterialCommunityIcons name={tip.icon as any} size={20} color="#667EEA" />
+            <View key={tip.id} style={[styles.tipCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View style={[styles.tipIconContainer, { backgroundColor: isDarkMode ? colors.card : '#F0F4FF' }]}>
+                <MaterialCommunityIcons name={tip.icon as any} size={20} color={colors.primary} />
               </View>
-              <Text style={styles.tipText}>{tip.text}</Text>
+              <Text style={[styles.tipText, { color: colors.text }]}>{tip.text}</Text>
             </View>
           ))}
         </View>
@@ -534,27 +552,27 @@ const HomeScreen = () => {
         {recentActivities.length > 0 && user?.id && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <MaterialCommunityIcons name="history" size={24} color="#667EEA" />
-              <Text style={styles.sectionTitle}>Hoạt động gần đây</Text>
+              <MaterialCommunityIcons name="history" size={24} color={colors.primary} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Hoạt động gần đây</Text>
             </View>
             
             {recentActivities.map((activity) => (
-              <TouchableOpacity key={activity.id} style={styles.activityCard}>
-                <View style={styles.activityIconContainer}>
+              <TouchableOpacity key={activity.id} style={[styles.activityCard, { backgroundColor: colors.card }]}>
+                <View style={[styles.activityIconContainer, { backgroundColor: isDarkMode ? colors.card : '#F0F4FF' }]}>
                   <MaterialCommunityIcons 
                     name={activity.icon as any} 
                     size={24} 
-                    color="#667EEA" 
+                    color={colors.primary} 
                   />
                 </View>
                 <View style={styles.activityContent}>
-                  <Text style={styles.activityTitle}>{activity.title}</Text>
-                  <Text style={styles.activityTime}>{activity.time}</Text>
+                  <Text style={[styles.activityTitle, { color: colors.text }]}>{activity.title}</Text>
+                  <Text style={[styles.activityTime, { color: colors.textSecondary }]}>{activity.time}</Text>
                 </View>
                 <MaterialCommunityIcons 
                   name="chevron-right" 
                   size={24} 
-                  color="#CCC" 
+                  color={colors.textSecondary} 
                 />
               </TouchableOpacity>
             ))}
@@ -562,12 +580,12 @@ const HomeScreen = () => {
         )}
 
         {/* Daily Quote */}
-        <View style={styles.quoteContainer}>
-          <MaterialCommunityIcons name="format-quote-open" size={32} color="#667EEA" />
-          <Text style={styles.quoteText}>
+        <View style={[styles.quoteContainer, { backgroundColor: isDarkMode ? colors.card : '#F0F4FF' }]}>
+          <MaterialCommunityIcons name="format-quote-open" size={32} color={colors.primary} />
+          <Text style={[styles.quoteText, { color: colors.text }]}>
             {dailyQuote?.content || '"Mỗi ngày là một cơ hội mới để bắt đầu lại. Hãy tử tế với chính mình."'}
           </Text>
-          <Text style={styles.quoteAuthor}>- Sero Chat -</Text>
+          <Text style={[styles.quoteAuthor, { color: colors.primary }]}>- Sero Chat -</Text>
         </View>
 
         {/* Bottom spacing for tab bar */}
@@ -584,7 +602,6 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
   },
   loadingContainer: {
     flex: 1,
@@ -594,7 +611,6 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
   },
   scrollView: {
     flex: 1,
@@ -622,7 +638,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -631,6 +646,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
+    borderWidth: 1,
   },
   statIcon: {
     width: 48,
@@ -643,12 +659,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1A1A1A',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
     textAlign: 'center',
   },
   
@@ -698,12 +712,10 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1A1A1A',
     marginBottom: 4,
   },
   subGreeting: {
     fontSize: 14,
-    color: '#666',
   },
   headerRight: {
     flexDirection: 'row',
@@ -732,7 +744,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -772,7 +783,6 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: '#F0F4FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
@@ -783,14 +793,12 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#1A1A1A',
     textAlign: 'center',
     marginBottom: 12,
     lineHeight: 34,
   },
   heroSubtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 28,
   },
@@ -834,7 +842,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1A1A1A',
     marginBottom: 16,
   },
   topicsGrid: {
@@ -881,7 +888,6 @@ const styles = StyleSheet.create({
   },
   selfCareCard: {
     width: 180,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     padding: 20,
     marginRight: 12,
@@ -902,12 +908,10 @@ const styles = StyleSheet.create({
   selfCareTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A1A1A',
     marginBottom: 6,
   },
   selfCareDescription: {
     fontSize: 13,
-    color: '#666',
     lineHeight: 18,
     marginBottom: 12,
   },
@@ -995,7 +999,6 @@ const styles = StyleSheet.create({
   },
   blogCard: {
     width: 280,
-    backgroundColor: '#FFF',
     borderRadius: 16,
     marginRight: 16,
     overflow: 'hidden',
@@ -1021,7 +1024,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: '#667EEA',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -1037,13 +1039,11 @@ const styles = StyleSheet.create({
   blogTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A1A1A',
     marginBottom: 8,
     lineHeight: 22,
   },
   blogSummary: {
     fontSize: 14,
-    color: '#666',
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -1054,13 +1054,11 @@ const styles = StyleSheet.create({
   },
   blogReadTime: {
     fontSize: 13,
-    color: '#999',
   },
   
   // Quote
   quoteContainer: {
     marginHorizontal: 20,
-    backgroundColor: '#F0F4FF',
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
@@ -1068,7 +1066,6 @@ const styles = StyleSheet.create({
   },
   quoteText: {
     fontSize: 16,
-    color: '#333',
     textAlign: 'center',
     fontStyle: 'italic',
     lineHeight: 24,
@@ -1076,14 +1073,12 @@ const styles = StyleSheet.create({
   },
   quoteAuthor: {
     fontSize: 14,
-    color: '#667EEA',
     fontWeight: '600',
   },
   
   // Quick Tips
   tipCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -1093,12 +1088,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
   },
   tipIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F0F4FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1106,14 +1101,12 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
     lineHeight: 20,
   },
   
   // Recent Activities
   activityCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -1128,7 +1121,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F0F4FF',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -1139,12 +1131,10 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1A1A1A',
     marginBottom: 4,
   },
   activityTime: {
     fontSize: 13,
-    color: '#999',
   },
   
   bottomSpacer: {

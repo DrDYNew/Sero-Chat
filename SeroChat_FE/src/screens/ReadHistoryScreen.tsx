@@ -14,9 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import blogService, { BlogListItem } from '../services/blogService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const ReadHistoryScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -77,7 +79,7 @@ const ReadHistoryScreen = ({ navigation }: any) => {
 
   const renderBlogItem = ({ item }: { item: any }) => (
     <TouchableOpacity
-      style={styles.blogCard}
+      style={[styles.blogCard, { backgroundColor: colors.card }]}
       onPress={() => handleBlogPress(item.blogId)}
       activeOpacity={0.7}
     >
@@ -85,36 +87,36 @@ const ReadHistoryScreen = ({ navigation }: any) => {
         <Image source={{ uri: item.thumbnailUrl }} style={styles.thumbnail} />
       )}
       <View style={styles.blogContent}>
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryText}>{item.categoryName}</Text>
+        <View style={[styles.categoryBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF' }]}>
+          <Text style={[styles.categoryText, { color: colors.primary }]}>{item.categoryName}</Text>
         </View>
-        <Text style={styles.blogTitle} numberOfLines={2}>
+        <Text style={[styles.blogTitle, { color: colors.text }]} numberOfLines={2}>
           {item.title}
         </Text>
         <View style={styles.blogMeta}>
-          <MaterialCommunityIcons name="account-circle" size={16} color="#666" />
-          <Text style={styles.authorName}>{item.authorName || 'Ẩn danh'}</Text>
+          <MaterialCommunityIcons name="account-circle" size={16} color={colors.textSecondary} />
+          <Text style={[styles.authorName, { color: colors.textSecondary }]}>{item.authorName || 'Ẩn danh'}</Text>
         </View>
         <View style={styles.readInfo}>
-          <MaterialCommunityIcons name="clock-outline" size={14} color="#999" />
-          <Text style={styles.readTime}>Đã đọc {getTimeAgo(item.readAt)}</Text>
+          <MaterialCommunityIcons name="clock-outline" size={14} color={colors.textSecondary} />
+          <Text style={[styles.readTime, { color: colors.textSecondary }]}>Đã đọc {getTimeAgo(item.readAt)}</Text>
         </View>
       </View>
       <View style={styles.chevronContainer}>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#ccc" />
+        <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
       </View>
     </TouchableOpacity>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="history" size={80} color="#ccc" />
-      <Text style={styles.emptyTitle}>Chưa có lịch sử đọc</Text>
-      <Text style={styles.emptyText}>
+      <MaterialCommunityIcons name="history" size={80} color={isDarkMode ? '#334155' : '#ccc'} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>Chưa có lịch sử đọc</Text>
+      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
         Các bài viết bạn đọc sẽ xuất hiện ở đây
       </Text>
       <TouchableOpacity
-        style={styles.exploreButton}
+        style={[styles.exploreButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Explore')}
       >
         <Text style={styles.exploreButtonText}>Khám phá blog</Text>
@@ -124,30 +126,30 @@ const ReadHistoryScreen = ({ navigation }: any) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Lịch sử đọc</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Lịch sử đọc</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6366F1" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lịch sử đọc</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Lịch sử đọc</Text>
         <TouchableOpacity onPress={loadReadHistory}>
-          <MaterialCommunityIcons name="refresh" size={24} color="#333" />
+          <MaterialCommunityIcons name="refresh" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 

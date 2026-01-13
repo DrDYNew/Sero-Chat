@@ -10,8 +10,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../contexts/ThemeContext';
 
 const AboutScreen = ({ navigation }: any) => {
+  const { colors, isDarkMode } = useTheme();
+  
   const teamMembers = [
     {
       id: '1',
@@ -100,45 +103,45 @@ const AboutScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Về Sero Chat</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Về Sero Chat</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Logo & Brand */}
-        <View style={styles.brandSection}>
-          <View style={styles.logoContainer}>
-            <MaterialCommunityIcons name="chat-processing" size={60} color="#8B5CF6" />
+        <View style={[styles.brandSection, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
+          <View style={[styles.logoContainer, { backgroundColor: isDarkMode ? '#3F2A6B' : '#F3E8FF' }]}>
+            <MaterialCommunityIcons name="chat-processing" size={60} color={colors.primary} />
           </View>
-          <Text style={styles.brandName}>Sero Chat</Text>
-          <Text style={styles.tagline}>Người bạn đồng hành sức khỏe tâm thần</Text>
-          <Text style={styles.version}>Phiên bản 1.0.0</Text>
+          <Text style={[styles.brandName, { color: colors.primary }]}>Sero Chat</Text>
+          <Text style={[styles.tagline, { color: colors.textSecondary }]}>Người bạn đồng hành sức khỏe tâm thần</Text>
+          <Text style={[styles.version, { color: colors.textSecondary }]}>Phiên bản 1.0.0</Text>
         </View>
 
         {/* Stats */}
-        <View style={styles.statsSection}>
+        <View style={[styles.statsSection, { backgroundColor: colors.card }]}>
           {stats.map((stat, index) => (
             <View key={index} style={styles.statCard}>
-              <MaterialCommunityIcons name={stat.icon as any} size={28} color="#8B5CF6" />
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+              <MaterialCommunityIcons name={stat.icon as any} size={28} color={colors.primary} />
+              <Text style={[styles.statValue, { color: colors.text }]}>{stat.value}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
             </View>
           ))}
         </View>
 
         {/* Mission */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="heart" size={24} color="#EF4444" />
-            <Text style={styles.sectionTitle}>Sứ mệnh của chúng tôi</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Sứ mệnh của chúng tôi</Text>
           </View>
-          <Text style={styles.missionText}>
+          <Text style={[styles.missionText, { color: colors.textSecondary }]}>
             Sero Chat được tạo ra với mục tiêu mang đến sự hỗ trợ tâm lý dễ tiếp cận, 
             an toàn và hiệu quả cho mọi người. Chúng tôi tin rằng sức khỏe tâm thần 
             là quyền cơ bản của mỗi con người và mọi người đều xứng đáng được lắng nghe, 
@@ -147,14 +150,14 @@ const AboutScreen = ({ navigation }: any) => {
         </View>
 
         {/* Features */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="star" size={24} color="#F59E0B" />
-            <Text style={styles.sectionTitle}>Tính năng nổi bật</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Tính năng nổi bật</Text>
           </View>
           <View style={styles.featuresGrid}>
             {features.map((feature, index) => (
-              <View key={index} style={styles.featureCard}>
+              <View key={index} style={[styles.featureCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}>
                 <View style={[styles.featureIcon, { backgroundColor: `${feature.color}15` }]}>
                   <MaterialCommunityIcons 
                     name={feature.icon as any} 
@@ -162,22 +165,22 @@ const AboutScreen = ({ navigation }: any) => {
                     color={feature.color} 
                   />
                 </View>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>{feature.description}</Text>
+                <Text style={[styles.featureTitle, { color: colors.text }]}>{feature.title}</Text>
+                <Text style={[styles.featureDescription, { color: colors.textSecondary }]}>{feature.description}</Text>
               </View>
             ))}
           </View>
         </View>
 
         {/* Team */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="account-group" size={24} color="#3B82F6" />
-            <Text style={styles.sectionTitle}>Đội ngũ sáng lập</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Đội ngũ sáng lập</Text>
           </View>
           <View style={styles.teamGrid}>
             {teamMembers.map((member) => (
-              <View key={member.id} style={styles.teamCard}>
+              <View key={member.id} style={[styles.teamCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}>
                 <View style={[styles.teamAvatar, { backgroundColor: `${member.color}15` }]}>
                   <MaterialCommunityIcons 
                     name={member.avatar as any} 
@@ -185,18 +188,18 @@ const AboutScreen = ({ navigation }: any) => {
                     color={member.color} 
                   />
                 </View>
-                <Text style={styles.teamName}>{member.name}</Text>
-                <Text style={styles.teamRole}>{member.role}</Text>
+                <Text style={[styles.teamName, { color: colors.text }]}>{member.name}</Text>
+                <Text style={[styles.teamRole, { color: colors.textSecondary }]}>{member.role}</Text>
               </View>
             ))}
           </View>
         </View>
 
         {/* Social Media */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="share-variant" size={24} color="#EC4899" />
-            <Text style={styles.sectionTitle}>Kết nối với chúng tôi</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Kết nối với chúng tôi</Text>
           </View>
           <View style={styles.socialLinks}>
             <TouchableOpacity
@@ -227,53 +230,53 @@ const AboutScreen = ({ navigation }: any) => {
         </View>
 
         {/* Contact & Legal */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <MaterialCommunityIcons name="information" size={24} color="#6B7280" />
-            <Text style={styles.sectionTitle}>Thông tin liên hệ</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Thông tin liên hệ</Text>
           </View>
           
           <TouchableOpacity style={styles.contactItem}>
             <MaterialCommunityIcons name="email" size={20} color="#3B82F6" />
-            <Text style={styles.contactText}>contact@serochat.com</Text>
+            <Text style={[styles.contactText, { color: colors.textSecondary }]}>contact@serochat.com</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.contactItem}>
             <MaterialCommunityIcons name="phone" size={20} color="#10B981" />
-            <Text style={styles.contactText}>+84 123 456 789</Text>
+            <Text style={[styles.contactText, { color: colors.textSecondary }]}>+84 123 456 789</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.contactItem}>
             <MaterialCommunityIcons name="map-marker" size={20} color="#EF4444" />
-            <Text style={styles.contactText}>
+            <Text style={[styles.contactText, { color: colors.textSecondary }]}>
               123 Nguyễn Huệ, Quận 1, TP.HCM, Việt Nam
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: isDarkMode ? '#374151' : '#E5E7EB' }]} />
 
           <TouchableOpacity style={styles.legalItem}>
-            <Text style={styles.legalText}>Điều khoản sử dụng</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
+            <Text style={[styles.legalText, { color: colors.textSecondary }]}>Điều khoản sử dụng</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.legalItem}>
-            <Text style={styles.legalText}>Chính sách bảo mật</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
+            <Text style={[styles.legalText, { color: colors.textSecondary }]}>Chính sách bảo mật</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.legalItem}>
-            <Text style={styles.legalText}>Giấy phép hoạt động</Text>
-            <MaterialCommunityIcons name="chevron-right" size={20} color="#9CA3AF" />
+            <Text style={[styles.legalText, { color: colors.textSecondary }]}>Giấy phép hoạt động</Text>
+            <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
         {/* Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>
             © 2026 Sero Chat. All rights reserved.
           </Text>
-          <Text style={styles.footerSubtext}>
+          <Text style={[styles.footerSubtext, { color: colors.textSecondary }]}>
             Made with ❤️ in Vietnam
           </Text>
         </View>

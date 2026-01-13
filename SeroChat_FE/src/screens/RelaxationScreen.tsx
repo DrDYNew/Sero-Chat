@@ -15,10 +15,12 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as relaxService from '../services/relaxService';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const RelaxationScreen: React.FC = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'MUSIC' | 'BREATHING' | 'MEDITATION'>('all');
   const [assets, setAssets] = useState<relaxService.RelaxAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,29 +104,29 @@ const RelaxationScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={colors.background} />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
-          <Text style={styles.loadingText}>Đang tải...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={colors.background} />
 
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB' }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thư giãn & Thiền</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Thư giãn & Thiền</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -134,12 +136,12 @@ const RelaxationScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
       >
         {/* Description */}
-        <View style={styles.descriptionCard}>
-          <MaterialCommunityIcons name="spa" size={48} color="#667EEA" />
-          <Text style={styles.descriptionTitle}>
+        <View style={[styles.descriptionCard, { backgroundColor: colors.card }]}>
+          <MaterialCommunityIcons name="spa" size={48} color={colors.primary} />
+          <Text style={[styles.descriptionTitle, { color: colors.text }]}>
             Dành thời gian cho bản thân
           </Text>
-          <Text style={styles.descriptionText}>
+          <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
             Khám phá các bài tập thở, thiền và âm thanh để giúp bạn thư giãn, giảm căng thẳng và cải thiện giấc ngủ.
           </Text>
         </View>
@@ -156,18 +158,20 @@ const RelaxationScreen: React.FC = () => {
               key={category.id}
               style={[
                 styles.categoryChip,
-                selectedCategory === category.id && styles.categoryChipActive,
+                { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF', borderColor: isDarkMode ? '#334155' : '#E5E7EB' },
+                selectedCategory === category.id && [styles.categoryChipActive, { backgroundColor: colors.primary, borderColor: colors.primary }],
               ]}
               onPress={() => setSelectedCategory(category.id as any)}
             >
               <MaterialCommunityIcons
                 name={category.icon as any}
                 size={20}
-                color={selectedCategory === category.id ? '#FFF' : '#667EEA'}
+                color={selectedCategory === category.id ? '#FFF' : colors.primary}
               />
               <Text
                 style={[
                   styles.categoryLabel,
+                  { color: selectedCategory === category.id ? '#FFF' : colors.primary },
                   selectedCategory === category.id && styles.categoryLabelActive,
                 ]}
               >
@@ -181,8 +185,8 @@ const RelaxationScreen: React.FC = () => {
         <View style={styles.activitiesGrid}>
           {filteredAssets.length === 0 ? (
             <View style={styles.emptyState}>
-              <MaterialCommunityIcons name="spa-outline" size={64} color="#D1D5DB" />
-              <Text style={styles.emptyText}>Chưa có nội dung</Text>
+              <MaterialCommunityIcons name="spa-outline" size={64} color={isDarkMode ? '#334155' : '#D1D5DB'} />
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có nội dung</Text>
             </View>
           ) : (
             filteredAssets.map((asset) => (
@@ -236,33 +240,33 @@ const RelaxationScreen: React.FC = () => {
         </View>
 
         {/* Tips Section */}
-        <View style={styles.tipsCard}>
+        <View style={[styles.tipsCard, { backgroundColor: colors.card }]}>
           <View style={styles.tipsHeader}>
             <MaterialCommunityIcons name="lightbulb-on-outline" size={24} color="#F59E0B" />
-            <Text style={styles.tipsTitle}>Mẹo nhỏ</Text>
+            <Text style={[styles.tipsTitle, { color: colors.text }]}>Mẹo nhỏ</Text>
           </View>
           <View style={styles.tipsList}>
             <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tipText}>
+              <Text style={[styles.tipBullet, { color: colors.primary }]}>•</Text>
+              <Text style={[styles.tipText, { color: colors.textSecondary }]}>
                 Tìm không gian yên tĩnh, thoải mái
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tipText}>
+              <Text style={[styles.tipBullet, { color: colors.primary }]}>•</Text>
+              <Text style={[styles.tipText, { color: colors.textSecondary }]}>
                 Sử dụng tai nghe để trải nghiệm tốt hơn
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tipText}>
+              <Text style={[styles.tipBullet, { color: colors.primary }]}>•</Text>
+              <Text style={[styles.tipText, { color: colors.textSecondary }]}>
                 Thực hành đều đặn mỗi ngày 5-10 phút
               </Text>
             </View>
             <View style={styles.tipItem}>
-              <Text style={styles.tipBullet}>•</Text>
-              <Text style={styles.tipText}>
+              <Text style={[styles.tipBullet, { color: colors.primary }]}>•</Text>
+              <Text style={[styles.tipText, { color: colors.textSecondary }]}>
                 Nội dung Premium cần đăng ký gói để truy cập
               </Text>
             </View>

@@ -14,6 +14,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { subscriptionPlanService } from '../services/subscriptionPlanService';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface SubscriptionPlan {
   planId: number;
@@ -25,6 +26,7 @@ interface SubscriptionPlan {
 
 const SubscriptionPlansScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
@@ -111,7 +113,7 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
   const renderPlanFeature = (text: string) => (
     <View style={styles.featureItem}>
       <MaterialCommunityIcons name="check-circle" size={20} color="#10B981" />
-      <Text style={styles.featureText}>{text}</Text>
+      <Text style={[styles.featureText, { color: colors.text }]}>{text}</Text>
     </View>
   );
 
@@ -134,7 +136,7 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
           </View>
         )}
         
-        <View style={[styles.planCard, isPopular && styles.popularCard]}>
+        <View style={[styles.planCard, { backgroundColor: colors.card }, isPopular && styles.popularCard]}>
           <LinearGradient
             colors={colors}
             start={{ x: 0, y: 0 }}
@@ -216,25 +218,25 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
       
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.card }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#1A1A1A" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Gói dịch vụ</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Gói dịch vụ</Text>
         <View style={styles.headerRight} />
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
-          <Text style={styles.loadingText}>Đang tải danh sách gói...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải danh sách gói...</Text>
         </View>
       ) : (
         <ScrollView
@@ -243,12 +245,12 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
         >
           {/* Hero Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.heroIconContainer}>
+          <View style={[styles.heroSection, { backgroundColor: colors.card }]}>
+            <View style={[styles.heroIconContainer, { backgroundColor: isDarkMode ? '#3F2A0A' : '#FEF3C7' }]}>
               <MaterialCommunityIcons name="crown" size={80} color="#F59E0B" />
             </View>
-            <Text style={styles.heroTitle}>Nâng cấp trải nghiệm</Text>
-            <Text style={styles.heroSubtitle}>
+            <Text style={[styles.heroTitle, { color: colors.text }]}>Nâng cấp trải nghiệm</Text>
+            <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
               Chọn gói phù hợp để tận hưởng đầy đủ tính năng của Sero Chat
             </Text>
           </View>
@@ -257,8 +259,8 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
           <View style={styles.plansContainer}>
             {plans.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <MaterialCommunityIcons name="package-variant" size={64} color="#CCC" />
-                <Text style={styles.emptyText}>Chưa có gói dịch vụ nào</Text>
+                <MaterialCommunityIcons name="package-variant" size={64} color={colors.textSecondary} />
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có gói dịch vụ nào</Text>
               </View>
             ) : (
               plans.map(plan => renderPlanCard(plan))
@@ -267,26 +269,26 @@ const SubscriptionPlansScreen = ({ navigation }: any) => {
 
           {/* Info Section */}
           <View style={styles.infoSection}>
-            <View style={styles.infoCard}>
+            <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
               <MaterialCommunityIcons name="shield-check" size={32} color="#10B981" />
-              <Text style={styles.infoTitle}>Bảo mật tuyệt đối</Text>
-              <Text style={styles.infoText}>
+              <Text style={[styles.infoTitle, { color: colors.text }]}>Bảo mật tuyệt đối</Text>
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
                 Mọi thông tin cá nhân và cuộc trò chuyện của bạn được mã hóa và bảo mật
               </Text>
             </View>
 
-            <View style={styles.infoCard}>
+            <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
               <MaterialCommunityIcons name="cash-refund" size={32} color="#3B82F6" />
-              <Text style={styles.infoTitle}>Hoàn tiền 100%</Text>
-              <Text style={styles.infoText}>
+              <Text style={[styles.infoTitle, { color: colors.text }]}>Hoàn tiền 100%</Text>
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
                 Nếu không hài lòng, bạn có thể yêu cầu hoàn tiền trong 7 ngày
               </Text>
             </View>
 
-            <View style={styles.infoCard}>
+            <View style={[styles.infoCard, { backgroundColor: colors.card }]}>
               <MaterialCommunityIcons name="headset" size={32} color="#8B5CF6" />
-              <Text style={styles.infoTitle}>Hỗ trợ 24/7</Text>
-              <Text style={styles.infoText}>
+              <Text style={[styles.infoTitle, { color: colors.text }]}>Hỗ trợ 24/7</Text>
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
                 Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc của bạn
               </Text>
             </View>

@@ -14,9 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import blogService, { BlogListItem } from '../services/blogService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const SavedBlogsScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [blogs, setBlogs] = useState<BlogListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -88,7 +90,7 @@ const SavedBlogsScreen = ({ navigation }: any) => {
 
   const renderBlogItem = ({ item }: { item: BlogListItem }) => (
     <TouchableOpacity
-      style={styles.blogCard}
+      style={[styles.blogCard, { backgroundColor: colors.card }]}
       onPress={() => handleBlogPress(item.blogId)}
       activeOpacity={0.7}
     >
@@ -96,17 +98,17 @@ const SavedBlogsScreen = ({ navigation }: any) => {
         <Image source={{ uri: item.thumbnailUrl }} style={styles.thumbnail} />
       )}
       <View style={styles.blogContent}>
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryText}>{item.category?.categoryName}</Text>
+        <View style={[styles.categoryBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF' }]}>
+          <Text style={[styles.categoryText, { color: colors.primary }]}>{item.category?.categoryName}</Text>
         </View>
-        <Text style={styles.blogTitle} numberOfLines={2}>
+        <Text style={[styles.blogTitle, { color: colors.text }]} numberOfLines={2}>
           {item.title}
         </Text>
         <View style={styles.blogMeta}>
-          <MaterialCommunityIcons name="account-circle" size={16} color="#666" />
-          <Text style={styles.authorName}>{item.authorName || 'Ẩn danh'}</Text>
-          <Text style={styles.separator}>•</Text>
-          <Text style={styles.dateText}>
+          <MaterialCommunityIcons name="account-circle" size={16} color={colors.textSecondary} />
+          <Text style={[styles.authorName, { color: colors.textSecondary }]}>{item.authorName || 'Ẩn danh'}</Text>
+          <Text style={[styles.separator, { color: colors.textSecondary }]}>•</Text>
+          <Text style={[styles.dateText, { color: colors.textSecondary }]}>
             {new Date(item.createdAt).toLocaleDateString('vi-VN')}
           </Text>
         </View>
@@ -122,13 +124,13 @@ const SavedBlogsScreen = ({ navigation }: any) => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="bookmark-outline" size={80} color="#ccc" />
-      <Text style={styles.emptyTitle}>Chưa có blog đã lưu</Text>
-      <Text style={styles.emptyText}>
+      <MaterialCommunityIcons name="bookmark-outline" size={80} color={isDarkMode ? '#334155' : '#ccc'} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>Chưa có blog đã lưu</Text>
+      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
         Lưu các bài viết yêu thích để đọc sau
       </Text>
       <TouchableOpacity
-        style={styles.exploreButton}
+        style={[styles.exploreButton, { backgroundColor: colors.primary }]}
         onPress={() => navigation.navigate('Explore')}
       >
         <Text style={styles.exploreButtonText}>Khám phá blog</Text>
@@ -138,30 +140,30 @@ const SavedBlogsScreen = ({ navigation }: any) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Blog đã lưu</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Blog đã lưu</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#EC4899" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Blog đã lưu</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Blog đã lưu</Text>
         <TouchableOpacity onPress={loadSavedBlogs}>
-          <MaterialCommunityIcons name="refresh" size={24} color="#333" />
+          <MaterialCommunityIcons name="refresh" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 

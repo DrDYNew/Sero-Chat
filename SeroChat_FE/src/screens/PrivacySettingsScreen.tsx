@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface PrivacyOption {
   id: string;
@@ -20,6 +21,7 @@ interface PrivacyOption {
 }
 
 const PrivacySettingsScreen = ({ navigation }: any) => {
+  const { colors, isDarkMode } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState<PrivacyOption | null>(null);
 
@@ -136,42 +138,42 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Quyền riêng tư</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Quyền riêng tư</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
+        <View style={[styles.infoBanner, { backgroundColor: isDarkMode ? '#1E3A5F' : '#EFF6FF', borderLeftColor: '#3B82F6' }]}>
           <MaterialCommunityIcons name="shield-check" size={24} color="#3B82F6" />
           <View style={styles.infoBannerText}>
-            <Text style={styles.infoBannerTitle}>Bảo vệ quyền riêng tư của bạn</Text>
-            <Text style={styles.infoBannerDescription}>
+            <Text style={[styles.infoBannerTitle, { color: isDarkMode ? '#93C5FD' : '#1E40AF' }]}>Bảo vệ quyền riêng tư của bạn</Text>
+            <Text style={[styles.infoBannerDescription, { color: isDarkMode ? '#60A5FA' : '#3B82F6' }]}>
               Kiểm soát ai có thể xem thông tin và hoạt động của bạn
             </Text>
           </View>
         </View>
 
         {/* Privacy Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cài đặt quyền riêng tư</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Cài đặt quyền riêng tư</Text>
           {privacySettings.map((setting) => {
             const selectedOption = getSelectedOption(setting);
             return (
               <TouchableOpacity
                 key={setting.id}
-                style={styles.settingItem}
+                style={[styles.settingItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}
                 onPress={() => openModal(setting)}
               >
                 <View style={styles.settingInfo}>
-                  <Text style={styles.settingTitle}>{setting.title}</Text>
-                  <Text style={styles.settingDescription}>{setting.description}</Text>
+                  <Text style={[styles.settingTitle, { color: colors.text }]}>{setting.title}</Text>
+                  <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>{setting.description}</Text>
                   {selectedOption && (
                     <View style={styles.selectedOption}>
                       <MaterialCommunityIcons
@@ -190,20 +192,20 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
                     </View>
                   )}
                 </View>
-                <MaterialCommunityIcons name="chevron-right" size={24} color="#999" />
+                <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             );
           })}
         </View>
 
         {/* Activity Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cài đặt hoạt động</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Cài đặt hoạt động</Text>
 
-          <View style={styles.toggleItem}>
+          <View style={[styles.toggleItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Hiển thị trạng thái hoạt động</Text>
-              <Text style={styles.toggleDescription}>
+              <Text style={[styles.toggleTitle, { color: colors.text }]}>Hiển thị trạng thái hoạt động</Text>
+              <Text style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                 Cho phép người khác thấy khi bạn đang online
               </Text>
             </View>
@@ -215,10 +217,10 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
             />
           </View>
 
-          <View style={styles.toggleItem}>
+          <View style={[styles.toggleItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Xác nhận đã đọc</Text>
-              <Text style={styles.toggleDescription}>
+              <Text style={[styles.toggleTitle, { color: colors.text }]}>Xác nhận đã đọc</Text>
+              <Text style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                 Thông báo khi bạn đã đọc tin nhắn
               </Text>
             </View>
@@ -230,10 +232,10 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
             />
           </View>
 
-          <View style={styles.toggleItem}>
+          <View style={[styles.toggleItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Chia sẻ vị trí</Text>
-              <Text style={styles.toggleDescription}>
+              <Text style={[styles.toggleTitle, { color: colors.text }]}>Chia sẻ vị trí</Text>
+              <Text style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                 Cho phép ứng dụng truy cập vị trí của bạn
               </Text>
             </View>
@@ -247,13 +249,13 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
         </View>
 
         {/* Data & Privacy */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dữ liệu & Quyền riêng tư</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Dữ liệu & Quyền riêng tư</Text>
 
-          <View style={styles.toggleItem}>
+          <View style={[styles.toggleItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Thu thập dữ liệu</Text>
-              <Text style={styles.toggleDescription}>
+              <Text style={[styles.toggleTitle, { color: colors.text }]}>Thu thập dữ liệu</Text>
+              <Text style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                 Cho phép thu thập dữ liệu để cải thiện trải nghiệm
               </Text>
             </View>
@@ -265,10 +267,10 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
             />
           </View>
 
-          <View style={styles.toggleItem}>
+          <View style={[styles.toggleItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <View style={styles.toggleInfo}>
-              <Text style={styles.toggleTitle}>Cá nhân hóa nội dung</Text>
-              <Text style={styles.toggleDescription}>
+              <Text style={[styles.toggleTitle, { color: colors.text }]}>Cá nhân hóa nội dung</Text>
+              <Text style={[styles.toggleDescription, { color: colors.textSecondary }]}>
                 Sử dụng dữ liệu để đề xuất nội dung phù hợp
               </Text>
             </View>
@@ -280,22 +282,22 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.linkItem}>
+          <TouchableOpacity style={[styles.linkItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="file-document-outline" size={20} color="#3B82F6" />
             <Text style={styles.linkText}>Xem chính sách quyền riêng tư</Text>
             <MaterialCommunityIcons name="open-in-new" size={18} color="#3B82F6" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.linkItem}>
+          <TouchableOpacity style={[styles.linkItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="download" size={20} color="#3B82F6" />
             <Text style={styles.linkText}>Tải xuống dữ liệu của bạn</Text>
-            <MaterialCommunityIcons name="chevron-right" size={18} color="#999" />
+            <MaterialCommunityIcons name="chevron-right" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.linkItem}>
+          <TouchableOpacity style={[styles.linkItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="delete-outline" size={20} color="#EF4444" />
             <Text style={[styles.linkText, { color: '#EF4444' }]}>Xóa tài khoản</Text>
-            <MaterialCommunityIcons name="chevron-right" size={18} color="#999" />
+            <MaterialCommunityIcons name="chevron-right" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -312,22 +314,23 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
           activeOpacity={1}
           onPress={() => setModalVisible(false)}
         >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedSetting?.title}</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: isDarkMode ? '#374151' : '#E5E7EB' }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{selectedSetting?.title}</Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <MaterialCommunityIcons name="close" size={24} color="#666" />
+                <MaterialCommunityIcons name="close" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalDescription}>{selectedSetting?.description}</Text>
+            <Text style={[styles.modalDescription, { color: colors.textSecondary }]}>{selectedSetting?.description}</Text>
 
             {selectedSetting?.options.map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[
                   styles.modalOption,
-                  selectedSetting.value === option.value && styles.modalOptionSelected,
+                  { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB' },
+                  selectedSetting.value === option.value && [styles.modalOptionSelected, { backgroundColor: isDarkMode ? '#1E3A5F' : '#EFF6FF' }],
                 ]}
                 onPress={() => handleSelectOption(option.value)}
               >
@@ -337,15 +340,16 @@ const PrivacySettingsScreen = ({ navigation }: any) => {
                   color={
                     selectedSetting.value === option.value
                       ? '#3B82F6'
-                      : '#6B7280'
+                      : colors.textSecondary
                   }
                 />
                 <View style={styles.modalOptionText}>
                   <Text
                     style={[
                       styles.modalOptionLabel,
+                      { color: colors.textSecondary },
                       selectedSetting.value === option.value &&
-                        styles.modalOptionLabelSelected,
+                        [styles.modalOptionLabelSelected, { color: isDarkMode ? '#93C5FD' : '#1E40AF' }],
                     ]}
                   >
                     {option.label}

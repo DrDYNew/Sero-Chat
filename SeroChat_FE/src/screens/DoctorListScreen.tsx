@@ -13,8 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import doctorService, { Doctor, Specialty } from '../services/doctorService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const DoctorListScreen = ({ navigation }: any) => {
+  const { colors, isDarkMode } = useTheme();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [selectedSpecialty, setSelectedSpecialty] = useState<number | null>(null);
@@ -59,10 +61,14 @@ const DoctorListScreen = ({ navigation }: any) => {
       contentContainerStyle={styles.specialtiesContainer}
     >
       <TouchableOpacity
-        style={[styles.specialtyChip, selectedSpecialty === null && styles.specialtyChipActive]}
+        style={[
+          styles.specialtyChip,
+          { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF', borderColor: isDarkMode ? '#334155' : '#E5E7EB' },
+          selectedSpecialty === null && [styles.specialtyChipActive, { backgroundColor: '#14B8A6', borderColor: '#14B8A6' }]
+        ]}
         onPress={() => setSelectedSpecialty(null)}
       >
-        <Text style={[styles.specialtyText, selectedSpecialty === null && styles.specialtyTextActive]}>
+        <Text style={[styles.specialtyText, { color: selectedSpecialty === null ? '#FFF' : colors.text }, selectedSpecialty === null && styles.specialtyTextActive]}>
           Tất cả
         </Text>
       </TouchableOpacity>
@@ -71,13 +77,15 @@ const DoctorListScreen = ({ navigation }: any) => {
           key={specialty.specialtyId}
           style={[
             styles.specialtyChip,
-            selectedSpecialty === specialty.specialtyId && styles.specialtyChipActive,
+            { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF', borderColor: isDarkMode ? '#334155' : '#E5E7EB' },
+            selectedSpecialty === specialty.specialtyId && [styles.specialtyChipActive, { backgroundColor: '#14B8A6', borderColor: '#14B8A6' }],
           ]}
           onPress={() => setSelectedSpecialty(specialty.specialtyId)}
         >
           <Text
             style={[
               styles.specialtyText,
+              { color: selectedSpecialty === specialty.specialtyId ? '#FFF' : colors.text },
               selectedSpecialty === specialty.specialtyId && styles.specialtyTextActive,
             ]}
           >
@@ -95,7 +103,7 @@ const DoctorListScreen = ({ navigation }: any) => {
 
   const renderDoctorCard = ({ item }: { item: Doctor }) => (
     <TouchableOpacity
-      style={styles.doctorCard}
+      style={[styles.doctorCard, { backgroundColor: colors.card }]}
       onPress={() => navigation.navigate('DoctorDetail', { doctorId: item.doctorId })}
       activeOpacity={0.7}
     >
@@ -103,7 +111,7 @@ const DoctorListScreen = ({ navigation }: any) => {
         {item.imageUrl ? (
           <Image source={{ uri: item.imageUrl }} style={styles.doctorImage} />
         ) : (
-          <View style={styles.doctorImagePlaceholder}>
+          <View style={[styles.doctorImagePlaceholder, { backgroundColor: isDarkMode ? '#1E293B' : '#E6F7F5' }]}>
             <MaterialCommunityIcons name="doctor" size={40} color="#14B8A6" />
           </View>
         )}
@@ -115,24 +123,24 @@ const DoctorListScreen = ({ navigation }: any) => {
       </View>
 
       <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>{item.name}</Text>
+        <Text style={[styles.doctorName, { color: colors.text }]}>{item.name}</Text>
         
-        <View style={styles.specialtyBadge}>
+        <View style={[styles.specialtyBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#E6F7F5' }]}>
           <MaterialCommunityIcons name="stethoscope" size={14} color="#14B8A6" />
           <Text style={styles.specialtyBadgeText}>{item.specialtyName}</Text>
         </View>
 
         {item.experienceYears && (
           <View style={styles.infoRow}>
-            <MaterialCommunityIcons name="briefcase-outline" size={16} color="#666" />
-            <Text style={styles.infoText}>{item.experienceYears} năm kinh nghiệm</Text>
+            <MaterialCommunityIcons name="briefcase-outline" size={16} color={colors.textSecondary} />
+            <Text style={[styles.infoText, { color: colors.textSecondary }]}>{item.experienceYears} năm kinh nghiệm</Text>
           </View>
         )}
 
         {item.address && (
           <View style={styles.infoRow}>
-            <MaterialCommunityIcons name="map-marker-outline" size={16} color="#666" />
-            <Text style={styles.infoText} numberOfLines={1}>{item.address}</Text>
+            <MaterialCommunityIcons name="map-marker-outline" size={16} color={colors.textSecondary} />
+            <Text style={[styles.infoText, { color: colors.textSecondary }]} numberOfLines={1}>{item.address}</Text>
           </View>
         )}
 
@@ -152,15 +160,15 @@ const DoctorListScreen = ({ navigation }: any) => {
         </View>
       </View>
 
-      <MaterialCommunityIcons name="chevron-right" size={24} color="#ccc" />
+      <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="doctor" size={80} color="#ccc" />
-      <Text style={styles.emptyTitle}>Chưa có bác sĩ</Text>
-      <Text style={styles.emptyText}>
+      <MaterialCommunityIcons name="doctor" size={80} color={isDarkMode ? '#334155' : '#ccc'} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>Chưa có bác sĩ</Text>
+      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
         {selectedSpecialty 
           ? 'Không tìm thấy bác sĩ trong chuyên khoa này'
           : 'Hiện chưa có bác sĩ nào trong hệ thống'}
@@ -170,12 +178,12 @@ const DoctorListScreen = ({ navigation }: any) => {
 
   if (loading && !refreshing) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tìm chuyên gia</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Tìm chuyên gia</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
@@ -186,20 +194,20 @@ const DoctorListScreen = ({ navigation }: any) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Tìm chuyên gia</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Tìm chuyên gia</Text>
         <TouchableOpacity onPress={loadData}>
-          <MaterialCommunityIcons name="refresh" size={24} color="#333" />
+          <MaterialCommunityIcons name="refresh" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.statsBar}>
+      <View style={[styles.statsBar, { backgroundColor: isDarkMode ? '#1E293B' : '#E6F7F5' }]}>
         <MaterialCommunityIcons name="account-group" size={20} color="#14B8A6" />
-        <Text style={styles.statsText}>
+        <Text style={[styles.statsText, { color: colors.text }]}>
           {doctors.length} bác sĩ tâm lý chuyên nghiệp
         </Text>
       </View>

@@ -13,11 +13,13 @@ import { CommonActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { profileService } from '../services/profileService';
 import { notificationService } from '../services/notificationService';
 
 const MenuScreen = ({ navigation }) => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     conversations: 0,
@@ -97,26 +99,26 @@ const MenuScreen = ({ navigation }) => {
     if (!isAuthenticated || !user) {
       return (
         <TouchableOpacity 
-          style={styles.userCard}
+          style={[styles.userCard, { backgroundColor: colors.card, borderColor: colors.border }]}
           onPress={() => navigation.navigate('Login')}
         >
           <View style={styles.avatarPlaceholder}>
-            <MaterialCommunityIcons name="account-circle" size={80} color="#ccc" />
+            <MaterialCommunityIcons name="account-circle" size={80} color={colors.border} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>Đăng nhập</Text>
-            <Text style={styles.userSubtext}>Để xem thông tin cá nhân</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>Đăng nhập</Text>
+            <Text style={[styles.userSubtext, { color: colors.textSecondary }]}>Để xem thông tin cá nhân</Text>
           </View>
         </TouchableOpacity>
       );
     }
 
     return (
-      <View style={styles.userCard}>
+      <View style={[styles.userCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         {user.avatarUrl ? (
           <Image source={{ uri: user.avatarUrl }} style={styles.userAvatar} />
         ) : (
-          <View style={styles.userAvatarPlaceholder}>
+          <View style={[styles.userAvatarPlaceholder, { backgroundColor: colors.primary }]}>
             <Text style={styles.userAvatarText}>
               {user.fullName?.charAt(0)?.toUpperCase() || 
                user.username?.charAt(0)?.toUpperCase() || 
@@ -125,17 +127,17 @@ const MenuScreen = ({ navigation }) => {
           </View>
         )}
         <View style={styles.userInfoContainer}>
-          <Text style={styles.userName}>
+          <Text style={[styles.userName, { color: colors.text }]}>
             {user.fullName || user.username || 'Người dùng'}
           </Text>
           {user.email && (
-            <Text style={styles.userEmail}>{user.email}</Text>
+            <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{user.email}</Text>
           )}
           {user.phoneNumber && (
-            <Text style={styles.userPhone}>📱 {user.phoneNumber}</Text>
+            <Text style={[styles.userPhone, { color: colors.textSecondary }]}>📱 {user.phoneNumber}</Text>
           )}
           <TouchableOpacity 
-            style={styles.editProfileButton}
+            style={[styles.editProfileButton, { backgroundColor: colors.primary }]}
             onPress={() => navigation.navigate('NotFound', { featureName: 'Chỉnh sửa hồ sơ' })}
           >
             <Text style={styles.editProfileText}>Chỉnh sửa hồ sơ</Text>
@@ -149,44 +151,44 @@ const MenuScreen = ({ navigation }) => {
     if (!isAuthenticated) return null;
 
     return (
-      <View style={styles.statsCard}>
+      <View style={[styles.statsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{stats.conversations}</Text>
-          <Text style={styles.statLabel}>Cuộc trò chuyện</Text>
+          <Text style={[styles.statNumber, { color: colors.text }]}>{stats.conversations}</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Cuộc trò chuyện</Text>
         </View>
-        <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{stats.savedBlogs}</Text>
-          <Text style={styles.statLabel}>Blog đã lưu</Text>
+          <Text style={[styles.statNumber, { color: colors.text }]}>{stats.savedBlogs}</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Blog đã lưu</Text>
         </View>
-        <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{stats.moodLogs}</Text>
-          <Text style={styles.statLabel}>Nhật ký</Text>
+          <Text style={[styles.statNumber, { color: colors.text }]}>{stats.moodLogs}</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Nhật ký</Text>
         </View>
       </View>
     );
   };
 
   const renderSectionTitle = (title) => (
-    <Text style={styles.sectionTitle}>{title}</Text>
+    <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
   );
 
   const renderMenuItem = (icon, title, subtitle, color, badge, onPress) => (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <View style={[styles.menuIcon, { backgroundColor: color || '#f0f0f0' }]}>
+    <TouchableOpacity style={[styles.menuItem, { backgroundColor: colors.card, borderColor: colors.border }]} onPress={onPress}>
+      <View style={[styles.menuIcon, { backgroundColor: color || colors.border }]}>
         <MaterialCommunityIcons name={icon} size={24} color="#fff" />
       </View>
       <View style={styles.menuContent}>
-        <Text style={styles.menuTitle}>{title}</Text>
-        {subtitle && <Text style={styles.menuSubtitle}>{subtitle}</Text>}
+        <Text style={[styles.menuTitle, { color: colors.text }]}>{title}</Text>
+        {subtitle && <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
       </View>
       {badge && (
         <View style={styles.menuBadge}>
           <Text style={styles.menuBadgeText}>{badge}</Text>
         </View>
       )}
-      <MaterialCommunityIcons name="chevron-right" size={20} color="#999" />
+      <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
@@ -315,23 +317,23 @@ const MenuScreen = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Hồ sơ</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Hồ sơ</Text>
         <View style={styles.headerRight} />
       </View>
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#8B5CF6" />
-            <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải dữ liệu...</Text>
           </View>
         ) : (
           <>
@@ -421,22 +423,22 @@ const MenuScreen = ({ navigation }) => {
 
             {isAuthenticated && (
               <TouchableOpacity 
-                style={styles.logoutButton}
+                style={[styles.logoutButton, { backgroundColor: colors.card, borderColor: colors.border }]}
                 onPress={handleLogout}
               >
-                <View style={[styles.menuIcon, { backgroundColor: '#EF4444' }]}>
+                <View style={[styles.menuIcon, { backgroundColor: colors.error }]}>
                   <MaterialCommunityIcons name="logout" size={24} color="#fff" />
                 </View>
                 <View style={styles.menuContent}>
-                  <Text style={[styles.menuTitle, { color: '#EF4444' }]}>Đăng xuất</Text>
-                  <Text style={styles.menuSubtitle}>Thoát khỏi tài khoản hiện tại</Text>
+                  <Text style={[styles.menuTitle, { color: colors.error }]}>Đăng xuất</Text>
+                  <Text style={[styles.menuSubtitle, { color: colors.textSecondary }]}>Thoát khỏi tài khoản hiện tại</Text>
                 </View>
               </TouchableOpacity>
             )}
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Sero Chat - Người bạn đồng hành sức khỏe tâm lý</Text>
-              <Text style={styles.footerSubtext}>© 2026 Sero Chat. All rights reserved.</Text>
+              <Text style={[styles.footerText, { color: colors.textSecondary }]}>Sero Chat - Người bạn đồng hành sức khỏe tâm lý</Text>
+              <Text style={[styles.footerSubtext, { color: colors.textSecondary }]}>© 2026 Sero Chat. All rights reserved.</Text>
             </View>
           </>
         )}
@@ -448,7 +450,6 @@ const MenuScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   header: {
     flexDirection: 'row',
@@ -456,9 +457,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   backButton: {
     padding: 4,
@@ -466,7 +465,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
   },
   headerRight: {
     width: 32,
@@ -483,13 +481,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 14,
-    color: '#6B7280',
   },
   userCard: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
     borderRadius: 12,
     marginHorizontal: 16,
     marginTop: 16,
@@ -515,7 +511,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#8B5CF6',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -535,29 +530,24 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 14,
-    color: '#6B7280',
     marginBottom: 2,
   },
   userPhone: {
     fontSize: 14,
-    color: '#6B7280',
     marginBottom: 8,
   },
   userSubtext: {
     fontSize: 14,
-    color: '#6B7280',
     marginTop: 4,
   },
   editProfileButton: {
     marginTop: 8,
     paddingVertical: 6,
     paddingHorizontal: 16,
-    backgroundColor: '#8B5CF6',
     borderRadius: 6,
     alignSelf: 'flex-start',
   },
@@ -571,7 +561,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     padding: 16,
-    backgroundColor: '#fff',
     borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 16,
@@ -580,6 +569,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
   },
   statItem: {
     alignItems: 'center',
@@ -588,23 +578,19 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#8B5CF6',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
     textAlign: 'center',
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#E5E7EB',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
     marginHorizontal: 16,
     marginTop: 20,
     marginBottom: 12,
@@ -613,7 +599,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
     marginHorizontal: 16,
     marginBottom: 8,
     borderRadius: 12,
@@ -622,6 +607,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+    borderWidth: 1,
   },
   menuIcon: {
     width: 44,
@@ -637,11 +623,9 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#111827',
   },
   menuSubtitle: {
     fontSize: 13,
-    color: '#6B7280',
     marginTop: 2,
   },
   menuBadge: {
@@ -662,13 +646,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
     marginHorizontal: 16,
     marginTop: 16,
     marginBottom: 24,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#FEE2E2',
   },
   footer: {
     alignItems: 'center',
@@ -677,12 +659,10 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 13,
-    color: '#6B7280',
     marginBottom: 4,
   },
   footerSubtext: {
     fontSize: 11,
-    color: '#9CA3AF',
   },
 });
 

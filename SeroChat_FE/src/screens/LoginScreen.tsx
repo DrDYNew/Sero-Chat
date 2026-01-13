@@ -19,9 +19,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/authService';
 import { LoginRequest } from '../types/auth.types';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function LoginScreen({ navigation }: any) {
   const { login: setAuthLogin } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -135,10 +137,10 @@ export default function LoginScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       keyboardVerticalOffset={0}
     >
-      <StatusBar style="light" />
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -147,7 +149,7 @@ export default function LoginScreen({ navigation }: any) {
       >
         {/* Header with Gradient */}
         <LinearGradient
-          colors={['#667eea', '#764ba2']}
+          colors={colors.gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.header}
@@ -165,32 +167,32 @@ export default function LoginScreen({ navigation }: any) {
         </LinearGradient>
 
         {/* Login Form */}
-        <View style={styles.formContainer}>
-          <Text style={styles.welcomeText}>Chào mừng trở lại!</Text>
-          <Text style={styles.welcomeSubtext}>Đăng nhập để tiếp tục</Text>
+        <View style={[styles.formContainer, { backgroundColor: colors.background }]}>
+          <Text style={[styles.welcomeText, { color: colors.text }]}>Chào mừng trở lại!</Text>
+          <Text style={[styles.welcomeSubtext, { color: colors.textSecondary }]}>Đăng nhập để tiếp tục</Text>
 
           {/* Error Message */}
           {error ? (
-            <View style={styles.errorContainer}>
-              <MaterialCommunityIcons name="alert-circle" size={20} color="#dc2626" />
-              <Text style={styles.errorText}>{error}</Text>
+            <View style={[styles.errorContainer, { backgroundColor: colors.error + '20', borderColor: colors.error }]}>
+              <MaterialCommunityIcons name="alert-circle" size={20} color={colors.error} />
+              <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>
             </View>
           ) : null}
 
           {/* Email Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <View style={styles.inputWrapper}>
+            <Text style={[styles.label, { color: colors.text }]}>Email</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <MaterialCommunityIcons 
                 name="email-outline" 
                 size={20} 
-                color="#9ca3af" 
+                color={colors.textSecondary} 
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="Nhập email của bạn"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -205,18 +207,18 @@ export default function LoginScreen({ navigation }: any) {
 
           {/* Password Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Mật khẩu</Text>
-            <View style={styles.inputWrapper}>
+            <Text style={[styles.label, { color: colors.text }]}>Mật khẩu</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <MaterialCommunityIcons 
                 name="lock-outline" 
                 size={20} 
-                color="#9ca3af" 
+                color={colors.textSecondary} 
                 style={styles.inputIcon}
               />
               <TextInput
-                style={[styles.input, { flex: 1 }]}
+                style={[styles.input, { flex: 1, color: colors.text }]}
                 placeholder="Nhập mật khẩu"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
@@ -232,7 +234,7 @@ export default function LoginScreen({ navigation }: any) {
                 <MaterialCommunityIcons 
                   name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
                   size={20} 
-                  color="#9ca3af"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -245,12 +247,12 @@ export default function LoginScreen({ navigation }: any) {
               onPress={() => setRememberMe(!rememberMe)}
               disabled={loading}
             >
-              <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
+              <View style={[styles.checkbox, { borderColor: colors.border }, rememberMe && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                 {rememberMe && (
                   <MaterialCommunityIcons name="check" size={16} color="#fff" />
                 )}
               </View>
-              <Text style={styles.rememberMeText}>Ghi nhớ đăng nhập</Text>
+              <Text style={[styles.rememberMeText, { color: colors.text }]}>Ghi nhớ đăng nhập</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -259,7 +261,7 @@ export default function LoginScreen({ navigation }: any) {
               }}
               disabled={loading}
             >
-              <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+              <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>Quên mật khẩu?</Text>
             </TouchableOpacity>
           </View>
 
@@ -270,7 +272,7 @@ export default function LoginScreen({ navigation }: any) {
             disabled={loading}
           >
             <LinearGradient
-              colors={loading ? ['#9ca3af', '#6b7280'] : ['#667eea', '#764ba2']}
+              colors={loading ? [colors.textSecondary, colors.border] : colors.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.loginButtonGradient}
@@ -285,29 +287,29 @@ export default function LoginScreen({ navigation }: any) {
 
           {/* Divider */}
           <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>hoặc</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.textSecondary }]}>hoặc</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
           {/* Google Login Button */}
           <TouchableOpacity 
-            style={styles.googleButton} 
+            style={[styles.googleButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
             onPress={handleGoogleLogin}
             disabled={loading}
           >
             <MaterialCommunityIcons name="google" size={24} color="#DB4437" />
-            <Text style={styles.googleButtonText}>Đăng nhập với Google</Text>
+            <Text style={[styles.googleButtonText, { color: colors.text }]}>Đăng nhập với Google</Text>
           </TouchableOpacity>
 
           {/* Register Link */}
           <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>Chưa có tài khoản? </Text>
+            <Text style={[styles.registerText, { color: colors.textSecondary }]}>Chưa có tài khoản? </Text>
             <TouchableOpacity 
               onPress={() => navigation.navigate('Register')}
               disabled={loading}
             >
-              <Text style={styles.registerLink}>Đăng ký ngay</Text>
+              <Text style={[styles.registerLink, { color: colors.primary }]}>Đăng ký ngay</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -319,7 +321,6 @@ export default function LoginScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8faff',
   },
   scrollContent: {
     flexGrow: 1,
@@ -361,32 +362,27 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1f2937',
     marginBottom: 8,
   },
   welcomeSubtext: {
     fontSize: 16,
-    color: '#6b7280',
     marginBottom: 24,
   },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fee2e2',
     padding: 14,
     borderRadius: 10,
     marginBottom: 20,
     gap: 10,
     borderWidth: 1,
-    borderColor: '#fca5a5',
-    shadowColor: '#dc2626',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },
   errorText: {
-    color: '#991b1b',
     fontSize: 14,
     flex: 1,
     fontWeight: '500',
@@ -398,16 +394,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
     marginBottom: 8,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
     paddingHorizontal: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -422,7 +415,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 16,
-    color: '#1f2937',
   },
   eyeIcon: {
     padding: 4,
@@ -442,22 +434,15 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
-    borderColor: '#d1d5db',
     marginRight: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  checkboxChecked: {
-    backgroundColor: '#667eea',
-    borderColor: '#667eea',
-  },
   rememberMeText: {
     fontSize: 14,
-    color: '#6b7280',
   },
   forgotPasswordText: {
     fontSize: 14,
-    color: '#667eea',
     fontWeight: '600',
   },
   loginButton: {
@@ -491,23 +476,19 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#e5e7eb',
   },
   dividerText: {
     marginHorizontal: 16,
     fontSize: 14,
-    color: '#9ca3af',
   },
   googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#fff',
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
     marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -517,7 +498,6 @@ const styles = StyleSheet.create({
   },
   googleButtonText: {
     fontSize: 15,
-    color: '#374151',
     fontWeight: '600',
   },
   registerContainer: {
@@ -527,11 +507,9 @@ const styles = StyleSheet.create({
   },
   registerText: {
     fontSize: 14,
-    color: '#6b7280',
   },
   registerLink: {
     fontSize: 14,
-    color: '#667eea',
     fontWeight: '600',
   },
 });

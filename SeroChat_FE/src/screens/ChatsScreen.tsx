@@ -18,6 +18,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { chatService } from '../services/chatService';
 import ConversationsModal from '../components/ConversationsModal';
 
@@ -32,6 +33,7 @@ const ChatsScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const flatListRef = useRef<FlatList>(null);
 
   const [messages, setMessages] = useState<Message[]>([
@@ -337,17 +339,17 @@ const ChatsScreen = () => {
     return (
       <View style={[styles.messageContainer, isUser ? styles.userMessageContainer : styles.aiMessageContainer]}>
         {!isUser && (
-          <View style={styles.aiAvatar}>
-            <MaterialCommunityIcons name="robot-happy" size={20} color="#667EEA" />
+          <View style={[styles.aiAvatar, { backgroundColor: isDarkMode ? '#1E293B' : '#E8F1FF' }]}>
+            <MaterialCommunityIcons name="robot-happy" size={20} color={colors.primary} />
           </View>
         )}
-        <View style={[styles.messageBubble, isUser ? styles.userBubble : styles.aiBubble]}>
-          <Text style={[styles.messageText, isUser ? styles.userText : styles.aiText]}>
+        <View style={[styles.messageBubble, isUser ? [styles.userBubble, { backgroundColor: colors.primary }] : [styles.aiBubble, { backgroundColor: colors.card, borderColor: isDarkMode ? '#334155' : '#E0E0E0' }]]}>
+          <Text style={[styles.messageText, isUser ? styles.userText : { color: colors.text }]}>
             {item.text}
           </Text>
         </View>
         {isUser && (
-          <View style={styles.userAvatar}>
+          <View style={[styles.userAvatar, { backgroundColor: colors.primary }]}>
             <MaterialCommunityIcons name="account" size={20} color="#FFF" />
           </View>
         )}
@@ -363,7 +365,7 @@ const ChatsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Crisis Modal */}
       <Modal
         visible={showCrisisModal}
@@ -372,7 +374,7 @@ const ChatsScreen = () => {
         onRequestClose={() => setShowCrisisModal(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+          <View style={[styles.modalContainer, { backgroundColor: colors.card }]}>
             <LinearGradient
               colors={['#667EEA', '#764BA2']}
               start={{ x: 0, y: 0 }}
@@ -384,30 +386,30 @@ const ChatsScreen = () => {
             </LinearGradient>
 
             <View style={styles.modalBody}>
-              <Text style={styles.modalMessage}>
+              <Text style={[styles.modalMessage, { color: colors.text }]}>
                 Cuộc sống của bạn rất quý giá. Nếu bạn đang gặp khó khăn, hãy biết rằng bạn không đơn độc. 
               </Text>
               
-              <View style={styles.helplineBox}>
-                <MaterialCommunityIcons name="phone" size={24} color="#667EEA" />
+              <View style={[styles.helplineBox, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF', borderColor: colors.primary }]}>
+                <MaterialCommunityIcons name="phone" size={24} color={colors.primary} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.helplineTitle}>Đường dây nóng 24/7</Text>
-                  <Text style={styles.helplineNumber}>1800 1234</Text>
+                  <Text style={[styles.helplineTitle, { color: colors.primary }]}>Đường dây nóng 24/7</Text>
+                  <Text style={[styles.helplineNumber, { color: colors.text }]}>1800 1234</Text>
                   <Text style={styles.helplineNote}>Miễn phí, bảo mật tuyệt đối</Text>
                 </View>
               </View>
 
-              <Text style={styles.modalSubtext}>
+              <Text style={[styles.modalSubtext, { color: colors.textSecondary }]}>
                 Hoặc bạn có thể liên hệ với các bác sĩ tâm lý chuyên nghiệp trong ứng dụng.
               </Text>
             </View>
 
-            <View style={styles.modalFooter}>
+            <View style={[styles.modalFooter, { borderTopColor: isDarkMode ? '#334155' : '#F0F0F0' }]}>
               <TouchableOpacity
-                style={styles.secondaryButton}
+                style={[styles.secondaryButton, { backgroundColor: isDarkMode ? '#334155' : '#F5F5F5' }]}
                 onPress={() => setShowCrisisModal(false)}
               >
-                <Text style={styles.secondaryButtonText}>Để sau</Text>
+                <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>Để sau</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -430,17 +432,17 @@ const ChatsScreen = () => {
       </Modal>
 
       <KeyboardAvoidingView 
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#E0E0E0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{currentConvTitle}</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>{currentConvTitle}</Text>
             <Text style={styles.headerSubtitle}>Trợ lý tâm lý AI</Text>
           </View>
           <TouchableOpacity 
@@ -458,23 +460,23 @@ const ChatsScreen = () => {
 
         {/* Guest/User Info Banner */}
         {isGuest ? (
-          <View style={styles.guestBanner}>
+          <View style={[styles.guestBanner, { backgroundColor: isDarkMode ? '#1E293B' : '#FFF3E0', borderBottomColor: isDarkMode ? '#475569' : '#FFE0B2' }]}>
             <MaterialCommunityIcons name="information" size={20} color="#FF9800" />
-            <Text style={styles.guestBannerText}>
+            <Text style={[styles.guestBannerText, { color: isDarkMode ? '#FFA726' : '#E65100' }]}>
               Bạn còn {GUEST_MESSAGE_LIMIT - messageCount} tin nhắn miễn phí
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginLink}>Đăng nhập</Text>
+              <Text style={[styles.loginLink, { color: colors.primary }]}>Đăng nhập</Text>
             </TouchableOpacity>
           </View>
         ) : dailyLimit > 0 && (
-          <View style={styles.guestBanner}>
-            <MaterialCommunityIcons name="chat-processing" size={20} color="#667EEA" />
-            <Text style={styles.guestBannerText}>
+          <View style={[styles.guestBanner, { backgroundColor: isDarkMode ? '#1E293B' : '#FFF3E0', borderBottomColor: isDarkMode ? '#475569' : '#FFE0B2' }]}>
+            <MaterialCommunityIcons name="chat-processing" size={20} color={colors.primary} />
+            <Text style={[styles.guestBannerText, { color: isDarkMode ? '#93C5FD' : colors.primary }]}>
               Còn {dailyLimit - messageCount}/{dailyLimit} lượt chat hôm nay
             </Text>
             <TouchableOpacity onPress={() => navigation.navigate('SubscriptionPlans')}>
-              <Text style={styles.loginLink}>Nâng cấp</Text>
+              <Text style={[styles.loginLink, { color: colors.primary }]}>Nâng cấp</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -492,17 +494,17 @@ const ChatsScreen = () => {
         {/* Loading Indicator */}
         {isLoading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#667EEA" />
-            <Text style={styles.loadingText}>SERO đang trả lời...</Text>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.primary }]}>SERO đang trả lời...</Text>
           </View>
         )}
 
         {/* Input Area */}
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: colors.card, borderTopColor: isDarkMode ? '#334155' : '#E0E0E0' }]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: isDarkMode ? '#1E293B' : '#F5F5F5', color: colors.text }]}
             placeholder="Nhập tin nhắn của bạn..."
-            placeholderTextColor="#999"
+            placeholderTextColor={isDarkMode ? '#64748B' : '#999'}
             value={inputText}
             onChangeText={setInputText}
             multiline
@@ -510,14 +512,14 @@ const ChatsScreen = () => {
             editable={!isLoading}
           />
           <TouchableOpacity 
-            style={[styles.sendButton, (!inputText.trim() || isLoading) && styles.sendButtonDisabled]}
+            style={[styles.sendButton, { backgroundColor: colors.primary }, (!inputText.trim() || isLoading) && styles.sendButtonDisabled]}
             onPress={sendMessage}
             disabled={!inputText.trim() || isLoading}
           >
             <MaterialCommunityIcons 
               name="send" 
               size={24} 
-              color={inputText.trim() && !isLoading ? '#FFF' : '#CCC'} 
+              color={inputText.trim() && !isLoading ? '#FFF' : isDarkMode ? '#475569' : '#CCC'} 
             />
           </TouchableOpacity>
         </View>

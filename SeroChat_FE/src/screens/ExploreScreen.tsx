@@ -17,11 +17,13 @@ import { useNavigation } from '@react-navigation/native';
 import { exploreService, Blog, BlogCategory } from '../services/exploreService';
 import blogService from '../services/blogService';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import BottomTabBar from '../components/BottomTabBar';
 
 const ExploreScreen = () => {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -80,10 +82,14 @@ const ExploreScreen = () => {
       contentContainerStyle={styles.categoriesContainer}
     >
       <TouchableOpacity
-        style={[styles.categoryChip, selectedCategory === null && styles.categoryChipActive]}
+        style={[
+          styles.categoryChip,
+          { backgroundColor: colors.card, borderColor: isDarkMode ? '#334155' : '#E0E0E0' },
+          selectedCategory === null && [styles.categoryChipActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+        ]}
         onPress={() => handleCategoryPress(null)}
       >
-        <Text style={[styles.categoryText, selectedCategory === null && styles.categoryTextActive]}>
+        <Text style={[styles.categoryText, { color: colors.textSecondary }, selectedCategory === null && styles.categoryTextActive]}>
           Tất cả
         </Text>
       </TouchableOpacity>
@@ -92,13 +98,15 @@ const ExploreScreen = () => {
           key={category.categoryId}
           style={[
             styles.categoryChip,
-            selectedCategory === category.categoryId && styles.categoryChipActive,
+            { backgroundColor: colors.card, borderColor: isDarkMode ? '#334155' : '#E0E0E0' },
+            selectedCategory === category.categoryId && [styles.categoryChipActive, { backgroundColor: colors.primary, borderColor: colors.primary }],
           ]}
           onPress={() => handleCategoryPress(category.categoryId)}
         >
           <Text
             style={[
               styles.categoryText,
+              { color: colors.textSecondary },
               selectedCategory === category.categoryId && styles.categoryTextActive,
             ]}
           >
@@ -124,7 +132,7 @@ const ExploreScreen = () => {
 
     return (
       <TouchableOpacity
-        style={styles.blogCard}
+        style={[styles.blogCard, { backgroundColor: colors.card }]}
         onPress={handleBlogPress}
         activeOpacity={0.7}
       >
@@ -143,26 +151,26 @@ const ExploreScreen = () => {
       
       <View style={styles.blogContent}>
         <View style={styles.blogMeta}>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryBadgeText}>{item.categoryName}</Text>
+          <View style={[styles.categoryBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF' }]}>
+            <Text style={[styles.categoryBadgeText, { color: colors.primary }]}>{item.categoryName}</Text>
           </View>
-          <Text style={styles.blogDate}>{formatDate(item.createdAt)}</Text>
+          <Text style={[styles.blogDate, { color: colors.textSecondary }]}>{formatDate(item.createdAt)}</Text>
         </View>
 
-        <Text style={styles.blogTitle} numberOfLines={2}>
+        <Text style={[styles.blogTitle, { color: colors.text }]} numberOfLines={2}>
           {item.title}
         </Text>
 
-        <Text style={styles.blogSummary} numberOfLines={3}>
+        <Text style={[styles.blogSummary, { color: colors.textSecondary }]} numberOfLines={3}>
           {item.summary}
         </Text>
 
         <View style={styles.blogFooter}>
           <View style={styles.readTimeContainer}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color="#999" />
-            <Text style={styles.readTime}>{item.readTime}</Text>
+            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.textSecondary} />
+            <Text style={[styles.readTime, { color: colors.textSecondary }]}>{item.readTime}</Text>
           </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#667EEA" />
+          <MaterialCommunityIcons name="chevron-right" size={24} color={colors.primary} />
         </View>
       </View>
     </TouchableOpacity>
@@ -171,13 +179,13 @@ const ExploreScreen = () => {
 
   if (isLoading && !isRefreshing) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Khám phá</Text>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#F0F0F0' }]}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Khám phá</Text>
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
-          <Text style={styles.loadingText}>Đang tải bài viết...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải bài viết...</Text>
         </View>
         <BottomTabBar />
       </SafeAreaView>
@@ -185,10 +193,10 @@ const ExploreScreen = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Khám phá</Text>
-        <Text style={styles.headerSubtitle}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#F0F0F0' }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Khám phá</Text>
+        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
           {blogs.length} bài viết về sức khỏe tâm lý
         </Text>
       </View>
@@ -204,14 +212,14 @@ const ExploreScreen = () => {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
-            colors={['#667EEA']}
-            tintColor="#667EEA"
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <MaterialCommunityIcons name="book-open-outline" size={80} color="#E0E0E0" />
-            <Text style={styles.emptyText}>Chưa có bài viết nào</Text>
+            <MaterialCommunityIcons name="book-open-outline" size={80} color={isDarkMode ? '#334155' : '#E0E0E0'} />
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Chưa có bài viết nào</Text>
           </View>
         }
       />

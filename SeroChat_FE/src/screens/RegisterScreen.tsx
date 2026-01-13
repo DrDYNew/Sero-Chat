@@ -18,9 +18,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { authService } from '../services/authService';
 import { RegisterRequest } from '../types/auth.types';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function RegisterScreen({ navigation }: any) {
   const { login: setAuthLogin } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -149,10 +151,10 @@ export default function RegisterScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       keyboardVerticalOffset={0}
     >
-      <StatusBar style="light" />
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -186,31 +188,31 @@ export default function RegisterScreen({ navigation }: any) {
         </LinearGradient>
 
         {/* Register Form */}
-        <View style={styles.formContainer}>
+        <View style={[styles.formContainer, { backgroundColor: colors.background }]}>
           {/* Error Message */}
           {error ? (
-            <View style={styles.errorContainer}>
+            <View style={[styles.errorContainer, { backgroundColor: isDarkMode ? '#3F1C1C' : '#fee2e2' }]}>
               <MaterialCommunityIcons name="alert-circle" size={20} color="#dc2626" />
-              <Text style={styles.errorText}>{error}</Text>
+              <Text style={[styles.errorText, { color: isDarkMode ? '#FCA5A5' : '#dc2626' }]}>{error}</Text>
             </View>
           ) : null}
 
           {/* Full Name Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Họ và tên <Text style={styles.required}>*</Text>
             </Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? '#1F2937' : '#f9fafb', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
               <MaterialCommunityIcons
                 name="account-outline"
                 size={20}
-                color="#9ca3af"
+                color={colors.textSecondary}
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="Nhập họ và tên của bạn"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={fullName}
                 onChangeText={(text) => {
                   setFullName(text);
@@ -223,20 +225,20 @@ export default function RegisterScreen({ navigation }: any) {
 
           {/* Email Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Email <Text style={styles.required}>*</Text>
             </Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? '#1F2937' : '#f9fafb', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
               <MaterialCommunityIcons
                 name="email-outline"
                 size={20}
-                color="#9ca3af"
+                color={colors.textSecondary}
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="example@email.com"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
@@ -251,18 +253,18 @@ export default function RegisterScreen({ navigation }: any) {
 
           {/* Phone Number Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Số điện thoại (không bắt buộc)</Text>
-            <View style={styles.inputWrapper}>
+            <Text style={[styles.label, { color: colors.text }]}>Số điện thoại (không bắt buộc)</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? '#1F2937' : '#f9fafb', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
               <MaterialCommunityIcons
                 name="phone-outline"
                 size={20}
-                color="#9ca3af"
+                color={colors.textSecondary}
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="0987654321"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={phoneNumber}
                 onChangeText={(text) => {
                   setPhoneNumber(text);
@@ -276,20 +278,20 @@ export default function RegisterScreen({ navigation }: any) {
 
           {/* Password Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Mật khẩu <Text style={styles.required}>*</Text>
             </Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? '#1F2937' : '#f9fafb', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
               <MaterialCommunityIcons
                 name="lock-outline"
                 size={20}
-                color="#9ca3af"
+                color={colors.textSecondary}
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="Ít nhất 6 ký tự, có chữ hoa và số"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
@@ -305,31 +307,31 @@ export default function RegisterScreen({ navigation }: any) {
                 <MaterialCommunityIcons
                   name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={20}
-                  color="#9ca3af"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
-            <Text style={styles.hint}>
+            <Text style={[styles.hint, { color: colors.textSecondary }]}>
               💡 Mật khẩu mạnh: ít nhất 6 ký tự, có chữ hoa, số
             </Text>
           </View>
 
           {/* Confirm Password Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>
+            <Text style={[styles.label, { color: colors.text }]}>
               Xác nhận mật khẩu <Text style={styles.required}>*</Text>
             </Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? '#1F2937' : '#f9fafb', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
               <MaterialCommunityIcons
                 name="lock-check-outline"
                 size={20}
-                color="#9ca3af"
+                color={colors.textSecondary}
                 style={styles.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="Nhập lại mật khẩu"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.textSecondary}
                 value={confirmPassword}
                 onChangeText={(text) => {
                   setConfirmPassword(text);
@@ -345,7 +347,7 @@ export default function RegisterScreen({ navigation }: any) {
                 <MaterialCommunityIcons
                   name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={20}
-                  color="#9ca3af"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -357,15 +359,15 @@ export default function RegisterScreen({ navigation }: any) {
             onPress={() => setAgreeTerms(!agreeTerms)}
             disabled={loading}
           >
-            <View style={[styles.checkbox, agreeTerms && styles.checkboxChecked]}>
+            <View style={[styles.checkbox, { borderColor: isDarkMode ? '#4B5563' : '#d1d5db' }, agreeTerms && [styles.checkboxChecked, { backgroundColor: colors.primary, borderColor: colors.primary }]]}>
               {agreeTerms && (
                 <MaterialCommunityIcons name="check" size={16} color="#fff" />
               )}
             </View>
-            <Text style={styles.checkboxLabel}>
+            <Text style={[styles.checkboxLabel, { color: colors.textSecondary }]}>
               Tôi đồng ý với{' '}
-              <Text style={styles.link}>Điều khoản sử dụng</Text> và{' '}
-              <Text style={styles.link}>Chính sách bảo mật</Text>
+              <Text style={[styles.link, { color: colors.primary }]}>Điều khoản sử dụng</Text> và{' '}
+              <Text style={[styles.link, { color: colors.primary }]}>Chính sách bảo mật</Text>
             </Text>
           </TouchableOpacity>
 
@@ -394,33 +396,33 @@ export default function RegisterScreen({ navigation }: any) {
 
           {/* Divider */}
           <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>hoặc</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: isDarkMode ? '#374151' : '#e5e7eb' }]} />
+            <Text style={[styles.dividerText, { color: colors.textSecondary }]}>hoặc</Text>
+            <View style={[styles.dividerLine, { backgroundColor: isDarkMode ? '#374151' : '#e5e7eb' }]} />
           </View>
 
           {/* Google Sign Up */}
           <TouchableOpacity
-            style={styles.googleButton}
+            style={[styles.googleButton, { backgroundColor: colors.card, borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}
             onPress={() => Alert.alert('Thông báo', 'Đăng ký Google đang được phát triển')}
             disabled={loading}
           >
             <MaterialCommunityIcons name="google" size={20} color="#EA4335" />
-            <Text style={styles.googleButtonText}>Đăng ký bằng Google</Text>
+            <Text style={[styles.googleButtonText, { color: colors.text }]}>Đăng ký bằng Google</Text>
           </TouchableOpacity>
 
           {/* Login Link */}
           <View style={styles.loginLinkContainer}>
-            <Text style={styles.loginLinkText}>Đã có tài khoản? </Text>
+            <Text style={[styles.loginLinkText, { color: colors.textSecondary }]}>Đã có tài khoản? </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')} disabled={loading}>
-              <Text style={styles.loginLink}>Đăng nhập ngay</Text>
+              <Text style={[styles.loginLink, { color: colors.primary }]}>Đăng nhập ngay</Text>
             </TouchableOpacity>
           </View>
 
           {/* Info Box */}
-          <View style={styles.infoBox}>
-            <MaterialCommunityIcons name="information" size={20} color="#667eea" />
-            <Text style={styles.infoText}>
+          <View style={[styles.infoBox, { backgroundColor: isDarkMode ? '#1E3A5F' : '#eff6ff', borderLeftColor: colors.primary }]}>
+            <MaterialCommunityIcons name="information" size={20} color={colors.primary} />
+            <Text style={[styles.infoText, { color: isDarkMode ? '#93C5FD' : '#1e40af' }]}>
               Sau khi đăng ký, bạn sẽ nhận được email xác thực. Vui lòng kiểm tra hộp thư để kích
               hoạt tài khoản.
             </Text>

@@ -44,13 +44,15 @@ import HelpSupportScreen from './src/screens/HelpSupportScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import NotificationScreen from './src/screens/NotificationScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
+    <ThemeProvider>
+      <AuthProvider>
+        <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
@@ -101,6 +103,7 @@ export default function App() {
           <Stack.Screen name="Notification" component={NotificationScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

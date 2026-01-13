@@ -13,9 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import doctorService, { DoctorDetail } from '../services/doctorService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const DoctorDetailScreen = ({ route, navigation }: any) => {
   const { doctorId } = route.params;
+  const { colors, isDarkMode } = useTheme();
   const [doctor, setDoctor] = useState<DoctorDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,12 +54,12 @@ const DoctorDetailScreen = ({ route, navigation }: any) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Thông tin bác sĩ</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Thông tin bác sĩ</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
@@ -69,40 +71,40 @@ const DoctorDetailScreen = ({ route, navigation }: any) => {
 
   if (!doctor) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Thông tin bác sĩ</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Thông tin bác sĩ</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.errorContainer}>
-          <MaterialCommunityIcons name="alert-circle" size={64} color="#999" />
-          <Text style={styles.errorText}>Không tìm thấy thông tin bác sĩ</Text>
+          <MaterialCommunityIcons name="alert-circle" size={64} color={colors.textSecondary} />
+          <Text style={[styles.errorText, { color: colors.textSecondary }]}>Không tìm thấy thông tin bác sĩ</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thông tin bác sĩ</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Thông tin bác sĩ</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Doctor Profile Card */}
-        <View style={styles.profileCard}>
+        <View style={[styles.profileCard, { backgroundColor: colors.card }]}>
           <View style={styles.imageContainer}>
             {doctor.imageUrl ? (
               <Image source={{ uri: doctor.imageUrl }} style={styles.doctorImage} />
             ) : (
-              <View style={styles.imagePlaceholder}>
+              <View style={[styles.imagePlaceholder, { backgroundColor: isDarkMode ? '#1E293B' : '#E6F7F5' }]}>
                 <MaterialCommunityIcons name="doctor" size={60} color="#14B8A6" />
               </View>
             )}
@@ -113,17 +115,17 @@ const DoctorDetailScreen = ({ route, navigation }: any) => {
             )}
           </View>
 
-          <Text style={styles.doctorName}>{doctor.name}</Text>
+          <Text style={[styles.doctorName, { color: colors.text }]}>{doctor.name}</Text>
           
-          <View style={styles.specialtyTag}>
+          <View style={[styles.specialtyTag, { backgroundColor: isDarkMode ? '#1E293B' : '#E6F7F5' }]}>
             <MaterialCommunityIcons name="stethoscope" size={16} color="#14B8A6" />
             <Text style={styles.specialtyText}>{doctor.specialtyName}</Text>
           </View>
 
           {doctor.experienceYears && (
             <View style={styles.experienceRow}>
-              <MaterialCommunityIcons name="briefcase-outline" size={18} color="#666" />
-              <Text style={styles.experienceText}>
+              <MaterialCommunityIcons name="briefcase-outline" size={18} color={colors.textSecondary} />
+              <Text style={[styles.experienceText, { color: colors.textSecondary }]}>
                 {doctor.experienceYears} năm kinh nghiệm
               </Text>
             </View>
@@ -148,32 +150,32 @@ const DoctorDetailScreen = ({ route, navigation }: any) => {
 
         {/* Bio Section */}
         {doctor.bioDetail && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Giới thiệu</Text>
+          <View style={[styles.section, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Giới thiệu</Text>
             <View style={styles.sectionContent}>
-              <Text style={styles.bioText}>{doctor.bioDetail}</Text>
+              <Text style={[styles.bioText, { color: colors.textSecondary }]}>{doctor.bioDetail}</Text>
             </View>
           </View>
         )}
 
         {/* Specialty Details */}
         {doctor.specialtyDescription && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chuyên khoa</Text>
+          <View style={[styles.section, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Chuyên khoa</Text>
             <View style={styles.sectionContent}>
-              <Text style={styles.sectionText}>{doctor.specialtyDescription}</Text>
+              <Text style={[styles.sectionText, { color: colors.textSecondary }]}>{doctor.specialtyDescription}</Text>
             </View>
           </View>
         )}
 
         {/* Address */}
         {doctor.address && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Địa chỉ</Text>
+          <View style={[styles.section, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Địa chỉ</Text>
             <View style={styles.sectionContent}>
               <View style={styles.addressRow}>
                 <MaterialCommunityIcons name="map-marker" size={20} color="#14B8A6" />
-                <Text style={styles.addressText}>{doctor.address}</Text>
+                <Text style={[styles.addressText, { color: colors.textSecondary }]}>{doctor.address}</Text>
               </View>
             </View>
           </View>
@@ -181,19 +183,19 @@ const DoctorDetailScreen = ({ route, navigation }: any) => {
 
         {/* Certificates */}
         {doctor.certificates.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
+          <View style={[styles.section, { backgroundColor: colors.card }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
               Chứng chỉ ({doctor.certificates.length})
             </Text>
             <View style={styles.certificatesGrid}>
               {doctor.certificates.map((cert) => (
-                <View key={cert.certId} style={styles.certificateCard}>
+                <View key={cert.certId} style={[styles.certificateCard, { backgroundColor: isDarkMode ? '#1E293B' : '#F9FAFB' }]}>
                   <Image
                     source={{ uri: cert.imageUrl }}
                     style={styles.certificateImage}
                   />
                   {cert.certificateName && (
-                    <Text style={styles.certificateName} numberOfLines={2}>
+                    <Text style={[styles.certificateName, { color: colors.text }]} numberOfLines={2}>
                       {cert.certificateName}
                     </Text>
                   )}

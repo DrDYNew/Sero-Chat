@@ -12,9 +12,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { profileService } from '../services/profileService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const ChangePasswordScreen = ({ navigation }: any) => {
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -84,45 +86,45 @@ const ChangePasswordScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Đổi mật khẩu</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Đổi mật khẩu</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.content}>
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
+        <View style={[styles.infoBanner, { backgroundColor: isDarkMode ? '#3F2A0A' : '#FEF3C7' }]}>
           <MaterialCommunityIcons name="information" size={24} color="#F59E0B" />
-          <Text style={styles.infoText}>
+          <Text style={[styles.infoText, { color: isDarkMode ? '#FCD34D' : '#92400E' }]}>
             Mật khẩu mới phải có ít nhất 6 ký tự và khác mật khẩu cũ
           </Text>
         </View>
 
         {/* Form */}
-        <View style={styles.formSection}>
+        <View style={[styles.formSection, { backgroundColor: colors.card }]}>
           {/* Mật khẩu hiện tại */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Mật khẩu hiện tại</Text>
-            <View style={styles.passwordInput}>
-              <MaterialCommunityIcons name="lock" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Mật khẩu hiện tại</Text>
+            <View style={[styles.passwordInput, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa', borderColor: isDarkMode ? '#374151' : '#e0e0e0' }]}>
+              <MaterialCommunityIcons name="lock" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.oldPassword}
                 onChangeText={(text) => setFormData({ ...formData, oldPassword: text })}
                 placeholder="Nhập mật khẩu hiện tại"
                 secureTextEntry={!showOldPassword}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowOldPassword(!showOldPassword)}>
                 <MaterialCommunityIcons
                   name={showOldPassword ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -130,23 +132,23 @@ const ChangePasswordScreen = ({ navigation }: any) => {
 
           {/* Mật khẩu mới */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Mật khẩu mới</Text>
-            <View style={styles.passwordInput}>
-              <MaterialCommunityIcons name="lock-plus" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Mật khẩu mới</Text>
+            <View style={[styles.passwordInput, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa', borderColor: isDarkMode ? '#374151' : '#e0e0e0' }]}>
+              <MaterialCommunityIcons name="lock-plus" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.newPassword}
                 onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
                 placeholder="Nhập mật khẩu mới"
                 secureTextEntry={!showNewPassword}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
                 <MaterialCommunityIcons
                   name={showNewPassword ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -157,23 +159,23 @@ const ChangePasswordScreen = ({ navigation }: any) => {
 
           {/* Xác nhận mật khẩu mới */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Xác nhận mật khẩu mới</Text>
-            <View style={styles.passwordInput}>
-              <MaterialCommunityIcons name="lock-check" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Xác nhận mật khẩu mới</Text>
+            <View style={[styles.passwordInput, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa', borderColor: isDarkMode ? '#374151' : '#e0e0e0' }]}>
+              <MaterialCommunityIcons name="lock-check" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.confirmPassword}
                 onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
                 placeholder="Nhập lại mật khẩu mới"
                 secureTextEntry={!showConfirmPassword}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
               />
               <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
                 <MaterialCommunityIcons
                   name={showConfirmPassword ? 'eye-off' : 'eye'}
                   size={20}
-                  color="#999"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -185,15 +187,15 @@ const ChangePasswordScreen = ({ navigation }: any) => {
         </View>
 
         {/* Password Requirements */}
-        <View style={styles.requirementsSection}>
-          <Text style={styles.requirementsTitle}>Yêu cầu mật khẩu:</Text>
+        <View style={[styles.requirementsSection, { backgroundColor: colors.card }]}>
+          <Text style={[styles.requirementsTitle, { color: colors.text }]}>Yêu cầu mật khẩu:</Text>
           <View style={styles.requirementItem}>
             <MaterialCommunityIcons
               name={formData.newPassword.length >= 6 ? 'check-circle' : 'circle-outline'}
               size={18}
-              color={formData.newPassword.length >= 6 ? '#10B981' : '#999'}
+              color={formData.newPassword.length >= 6 ? '#10B981' : colors.textSecondary}
             />
-            <Text style={styles.requirementText}>Ít nhất 6 ký tự</Text>
+            <Text style={[styles.requirementText, { color: colors.textSecondary }]}>Ít nhất 6 ký tự</Text>
           </View>
           <View style={styles.requirementItem}>
             <MaterialCommunityIcons
@@ -210,10 +212,10 @@ const ChangePasswordScreen = ({ navigation }: any) => {
                 formData.oldPassword &&
                 formData.newPassword !== formData.oldPassword
                   ? '#10B981'
-                  : '#999'
+                  : colors.textSecondary
               }
             />
-            <Text style={styles.requirementText}>Khác mật khẩu cũ</Text>
+            <Text style={[styles.requirementText, { color: colors.textSecondary }]}>Khác mật khẩu cũ</Text>
           </View>
           <View style={styles.requirementItem}>
             <MaterialCommunityIcons
@@ -228,10 +230,10 @@ const ChangePasswordScreen = ({ navigation }: any) => {
                 formData.confirmPassword &&
                 formData.newPassword === formData.confirmPassword
                   ? '#10B981'
-                  : '#999'
+                  : colors.textSecondary
               }
             />
-            <Text style={styles.requirementText}>Xác nhận mật khẩu khớp</Text>
+            <Text style={[styles.requirementText, { color: colors.textSecondary }]}>Xác nhận mật khẩu khớp</Text>
           </View>
         </View>
 
@@ -239,6 +241,7 @@ const ChangePasswordScreen = ({ navigation }: any) => {
         <TouchableOpacity
           style={[
             styles.changeButton,
+            { backgroundColor: '#F59E0B' },
             loading && styles.changeButtonDisabled,
           ]}
           onPress={handleChangePassword}
@@ -255,9 +258,9 @@ const ChangePasswordScreen = ({ navigation }: any) => {
         </TouchableOpacity>
 
         {/* Warning */}
-        <View style={styles.warningSection}>
+        <View style={[styles.warningSection, { backgroundColor: isDarkMode ? '#3F1C1C' : '#FEE2E2' }]}>
           <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#EF4444" />
-          <Text style={styles.warningText}>
+          <Text style={[styles.warningText, { color: isDarkMode ? '#FCA5A5' : '#991B1B' }]}>
             Sau khi đổi mật khẩu, bạn sẽ cần đăng nhập lại bằng mật khẩu mới
           </Text>
         </View>

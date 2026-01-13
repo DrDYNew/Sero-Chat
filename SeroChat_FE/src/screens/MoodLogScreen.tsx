@@ -16,12 +16,14 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { moodService, MoodLog } from '../services/moodService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 const MoodLogScreen = () => {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [moodLogs, setMoodLogs] = useState<MoodLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -158,19 +160,20 @@ const MoodLogScreen = () => {
 
     return (
       <View style={styles.moodSelectorContainer}>
-        <Text style={styles.modalLabel}>Tâm trạng của bạn hôm nay thế nào?</Text>
+        <Text style={[styles.modalLabel, { color: colors.text }]}>Tâm trạng của bạn hôm nay thế nào?</Text>
         <View style={styles.moodOptions}>
           {moods.map((mood) => (
             <TouchableOpacity
               key={mood.score}
               style={[
                 styles.moodOption,
-                selectedMood === mood.score && styles.moodOptionSelected,
+                { backgroundColor: isDarkMode ? '#1E293B' : '#F9FAFB', borderColor: isDarkMode ? '#334155' : '#E5E7EB' },
+                selectedMood === mood.score && [styles.moodOptionSelected, { backgroundColor: isDarkMode ? '#1E40AF' : '#EEF2FF', borderColor: colors.primary }],
               ]}
               onPress={() => setSelectedMood(mood.score)}
             >
               <Text style={styles.moodEmoji}>{mood.emoji}</Text>
-              <Text style={styles.moodLabel}>{mood.label}</Text>
+              <Text style={[styles.moodLabel, { color: selectedMood === mood.score ? colors.primary : colors.textSecondary }]}>{mood.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -186,11 +189,11 @@ const MoodLogScreen = () => {
       onRequestClose={() => setShowAddModal(false)}
     >
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Ghi lại tâm trạng</Text>
+        <View style={[styles.modalContainer, { backgroundColor: colors.card }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: isDarkMode ? '#334155' : '#F0F0F0' }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Ghi lại tâm trạng</Text>
             <TouchableOpacity onPress={() => setShowAddModal(false)}>
-              <MaterialCommunityIcons name="close" size={24} color="#666" />
+              <MaterialCommunityIcons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -198,27 +201,27 @@ const MoodLogScreen = () => {
             {renderMoodSelector()}
 
             <View style={styles.noteContainer}>
-              <Text style={styles.modalLabel}>Ghi chú (không bắt buộc)</Text>
+              <Text style={[styles.modalLabel, { color: colors.text }]}>Ghi chú (không bắt buộc)</Text>
               <TextInput
-                style={styles.noteInput}
+                style={[styles.noteInput, { backgroundColor: isDarkMode ? '#1E293B' : '#F9FAFB', borderColor: isDarkMode ? '#334155' : '#E5E7EB', color: colors.text }]}
                 placeholder="Chia sẻ cảm xúc, suy nghĩ của bạn..."
-                placeholderTextColor="#999"
+                placeholderTextColor={isDarkMode ? '#64748B' : '#999'}
                 multiline
                 numberOfLines={4}
                 value={moodNote}
                 onChangeText={setMoodNote}
                 maxLength={500}
               />
-              <Text style={styles.charCount}>{moodNote.length}/500</Text>
+              <Text style={[styles.charCount, { color: colors.textSecondary }]}>{moodNote.length}/500</Text>
             </View>
           </ScrollView>
 
           <View style={styles.modalFooter}>
             <TouchableOpacity
-              style={styles.cancelButton}
+              style={[styles.cancelButton, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4F6' }]}
               onPress={() => setShowAddModal(false)}
             >
-              <Text style={styles.cancelButtonText}>Hủy</Text>
+              <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.saveButton}
@@ -243,22 +246,22 @@ const MoodLogScreen = () => {
   );
 
   const renderStatsCard = () => (
-    <View style={styles.statsCard}>
+    <View style={[styles.statsCard, { backgroundColor: colors.card }]}>
       <View style={styles.statItem}>
-        <Text style={styles.statValue}>{moodLogs.length}</Text>
-        <Text style={styles.statLabel}>Bản ghi</Text>
+        <Text style={[styles.statValue, { color: colors.text }]}>{moodLogs.length}</Text>
+        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Bản ghi</Text>
       </View>
-      <View style={styles.statDivider} />
+      <View style={[styles.statDivider, { backgroundColor: isDarkMode ? '#334155' : '#E5E7EB' }]} />
       <View style={styles.statItem}>
-        <Text style={styles.statValue}>{calculateAverageMood()}</Text>
-        <Text style={styles.statLabel}>Trung bình</Text>
+        <Text style={[styles.statValue, { color: colors.text }]}>{calculateAverageMood()}</Text>
+        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Trung bình</Text>
       </View>
-      <View style={styles.statDivider} />
+      <View style={[styles.statDivider, { backgroundColor: isDarkMode ? '#334155' : '#E5E7EB' }]} />
       <View style={styles.statItem}>
         <Text style={[styles.statValue, { fontSize: 32 }]}>
           {moodLogs.length > 0 ? getMoodEmoji(moodLogs[0].moodScore) : '😊'}
         </Text>
-        <Text style={styles.statLabel}>Gần nhất</Text>
+        <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Gần nhất</Text>
       </View>
     </View>
   );
@@ -267,15 +270,15 @@ const MoodLogScreen = () => {
     const moodColor = getMoodColor(log.moodScore);
     
     return (
-      <View key={log.logId} style={styles.logCard}>
+      <View key={log.logId} style={[styles.logCard, { backgroundColor: colors.card }]}>
         <View style={styles.logHeader}>
           <View style={styles.logMoodContainer}>
             <View style={[styles.logMoodCircle, { backgroundColor: moodColor }]}>
               <Text style={styles.logMoodEmoji}>{getMoodEmoji(log.moodScore)}</Text>
             </View>
             <View>
-              <Text style={styles.logMoodLabel}>{getMoodLabel(log.moodScore)}</Text>
-              <Text style={styles.logDate}>{formatDate(log.createdAt)}</Text>
+              <Text style={[styles.logMoodLabel, { color: colors.text }]}>{getMoodLabel(log.moodScore)}</Text>
+              <Text style={[styles.logDate, { color: colors.textSecondary }]}>{formatDate(log.createdAt)}</Text>
             </View>
           </View>
           <View style={styles.logActions}>
@@ -295,8 +298,8 @@ const MoodLogScreen = () => {
         </View>
         {log.note && (
           <View style={styles.logNoteContainer}>
-            <MaterialCommunityIcons name="text" size={16} color="#999" />
-            <Text style={styles.logNote}>{log.note}</Text>
+            <MaterialCommunityIcons name="text" size={16} color={colors.textSecondary} />
+            <Text style={[styles.logNote, { color: colors.textSecondary }]}>{log.note}</Text>
           </View>
         )}
       </View>
@@ -305,25 +308,25 @@ const MoodLogScreen = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="emoticon-happy-outline" size={80} color="#CCC" />
-      <Text style={styles.emptyTitle}>Chưa có nhật ký tâm trạng</Text>
-      <Text style={styles.emptySubtitle}>
+      <MaterialCommunityIcons name="emoticon-happy-outline" size={80} color={isDarkMode ? '#334155' : '#CCC'} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>Chưa có nhật ký tâm trạng</Text>
+      <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
         Bắt đầu ghi lại cảm xúc của bạn mỗi ngày để theo dõi sức khỏe tinh thần
       </Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB' }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Nhật ký tâm trạng</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Nhật ký tâm trạng</Text>
         <View style={{ width: 40 }} />
       </View>
 

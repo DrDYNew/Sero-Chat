@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface FAQ {
   id: string;
@@ -20,6 +21,7 @@ interface FAQ {
 }
 
 const HelpSupportScreen = ({ navigation }: any) => {
+  const { colors, isDarkMode } = useTheme();
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -130,59 +132,59 @@ const HelpSupportScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#E5E7EB' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Trợ giúp & Hỗ trợ</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Trợ giúp & Hỗ trợ</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Liên hệ hỗ trợ</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Liên hệ hỗ trợ</Text>
           <View style={styles.quickActions}>
             <TouchableOpacity 
-              style={styles.actionCard}
+              style={[styles.actionCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}
               onPress={() => handleContactSupport('email')}
             >
-              <View style={[styles.actionIcon, { backgroundColor: '#EFF6FF' }]}>
+              <View style={[styles.actionIcon, { backgroundColor: isDarkMode ? '#1E3A5F' : '#EFF6FF' }]}>
                 <MaterialCommunityIcons name="email" size={28} color="#3B82F6" />
               </View>
-              <Text style={styles.actionTitle}>Email</Text>
-              <Text style={styles.actionSubtitle}>support@serochat.com</Text>
+              <Text style={[styles.actionTitle, { color: colors.text }]}>Email</Text>
+              <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>support@serochat.com</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.actionCard}
+              style={[styles.actionCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}
               onPress={() => handleContactSupport('phone')}
             >
-              <View style={[styles.actionIcon, { backgroundColor: '#F0FDF4' }]}>
+              <View style={[styles.actionIcon, { backgroundColor: isDarkMode ? '#0F3A2E' : '#F0FDF4' }]}>
                 <MaterialCommunityIcons name="phone" size={28} color="#10B981" />
               </View>
-              <Text style={styles.actionTitle}>Hotline</Text>
-              <Text style={styles.actionSubtitle}>0123 456 789</Text>
+              <Text style={[styles.actionTitle, { color: colors.text }]}>Hotline</Text>
+              <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>0123 456 789</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
-              style={styles.actionCard}
+              style={[styles.actionCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}
               onPress={() => handleContactSupport('website')}
             >
-              <View style={[styles.actionIcon, { backgroundColor: '#FEF3C7' }]}>
+              <View style={[styles.actionIcon, { backgroundColor: isDarkMode ? '#3F2A0A' : '#FEF3C7' }]}>
                 <MaterialCommunityIcons name="web" size={28} color="#F59E0B" />
               </View>
-              <Text style={styles.actionTitle}>Website</Text>
-              <Text style={styles.actionSubtitle}>serochat.com</Text>
+              <Text style={[styles.actionTitle, { color: colors.text }]}>Website</Text>
+              <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>serochat.com</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* FAQ Categories */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Câu hỏi thường gặp</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Câu hỏi thường gặp</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -193,18 +195,20 @@ const HelpSupportScreen = ({ navigation }: any) => {
                 key={category.id}
                 style={[
                   styles.categoryChip,
-                  selectedCategory === category.id && styles.categoryChipActive,
+                  { backgroundColor: isDarkMode ? '#374151' : '#F3F4F6' },
+                  selectedCategory === category.id && [styles.categoryChipActive, { backgroundColor: colors.primary }],
                 ]}
                 onPress={() => setSelectedCategory(category.id)}
               >
                 <MaterialCommunityIcons
                   name={category.icon as any}
                   size={18}
-                  color={selectedCategory === category.id ? '#fff' : '#6B7280'}
+                  color={selectedCategory === category.id ? '#fff' : colors.textSecondary}
                 />
                 <Text
                   style={[
                     styles.categoryLabel,
+                    { color: colors.textSecondary },
                     selectedCategory === category.id && styles.categoryLabelActive,
                   ]}
                 >
@@ -217,7 +221,7 @@ const HelpSupportScreen = ({ navigation }: any) => {
           {/* FAQ List */}
           <View style={styles.faqList}>
             {filteredFaqs.map((faq) => (
-              <View key={faq.id} style={styles.faqItem}>
+              <View key={faq.id} style={[styles.faqItem, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}>
                 <TouchableOpacity
                   style={styles.faqQuestion}
                   onPress={() => toggleFaq(faq.id)}
@@ -225,18 +229,18 @@ const HelpSupportScreen = ({ navigation }: any) => {
                   <MaterialCommunityIcons
                     name="help-circle"
                     size={22}
-                    color="#8B5CF6"
+                    color={colors.primary}
                   />
-                  <Text style={styles.faqQuestionText}>{faq.question}</Text>
+                  <Text style={[styles.faqQuestionText, { color: colors.text }]}>{faq.question}</Text>
                   <MaterialCommunityIcons
                     name={expandedFaq === faq.id ? 'chevron-up' : 'chevron-down'}
                     size={24}
-                    color="#6B7280"
+                    color={colors.textSecondary}
                   />
                 </TouchableOpacity>
                 {expandedFaq === faq.id && (
                   <View style={styles.faqAnswer}>
-                    <Text style={styles.faqAnswerText}>{faq.answer}</Text>
+                    <Text style={[styles.faqAnswerText, { color: colors.textSecondary }]}>{faq.answer}</Text>
                   </View>
                 )}
               </View>
@@ -245,16 +249,16 @@ const HelpSupportScreen = ({ navigation }: any) => {
         </View>
 
         {/* Feedback Form */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gửi phản hồi</Text>
-          <View style={styles.feedbackCard}>
-            <Text style={styles.feedbackLabel}>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Gửi phản hồi</Text>
+          <View style={[styles.feedbackCard, { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB', borderColor: isDarkMode ? '#374151' : '#E5E7EB' }]}>
+            <Text style={[styles.feedbackLabel, { color: colors.text }]}>
               Bạn có góp ý hoặc câu hỏi khác?
             </Text>
             <TextInput
-              style={styles.feedbackInput}
+              style={[styles.feedbackInput, { backgroundColor: isDarkMode ? '#111827' : '#fff', borderColor: isDarkMode ? '#4B5563' : '#D1D5DB', color: colors.text }]}
               placeholder="Nhập nội dung phản hồi của bạn..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textSecondary}
               multiline
               numberOfLines={4}
               value={feedbackText}
@@ -262,7 +266,7 @@ const HelpSupportScreen = ({ navigation }: any) => {
               textAlignVertical="top"
             />
             <TouchableOpacity
-              style={styles.submitButton}
+              style={[styles.submitButton, { backgroundColor: colors.primary }]}
               onPress={handleSubmitFeedback}
             >
               <MaterialCommunityIcons name="send" size={20} color="#fff" />
@@ -272,33 +276,33 @@ const HelpSupportScreen = ({ navigation }: any) => {
         </View>
 
         {/* Additional Resources */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tài nguyên khác</Text>
+        <View style={[styles.section, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Tài nguyên khác</Text>
           <TouchableOpacity 
-            style={styles.resourceItem}
+            style={[styles.resourceItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}
             onPress={() => navigation.navigate('About')}
           >
             <MaterialCommunityIcons name="information" size={24} color="#3B82F6" />
-            <Text style={styles.resourceText}>Về Sero Chat</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#999" />
+            <Text style={[styles.resourceText, { color: colors.text }]}>Về Sero Chat</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resourceItem}>
+          <TouchableOpacity style={[styles.resourceItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="file-document" size={24} color="#10B981" />
-            <Text style={styles.resourceText}>Điều khoản sử dụng</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#999" />
+            <Text style={[styles.resourceText, { color: colors.text }]}>Điều khoản sử dụng</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resourceItem}>
+          <TouchableOpacity style={[styles.resourceItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="shield-check" size={24} color="#F59E0B" />
-            <Text style={styles.resourceText}>Chính sách bảo mật</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#999" />
+            <Text style={[styles.resourceText, { color: colors.text }]}>Chính sách bảo mật</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.resourceItem}>
+          <TouchableOpacity style={[styles.resourceItem, { borderBottomColor: isDarkMode ? '#374151' : '#F3F4F6' }]}>
             <MaterialCommunityIcons name="youtube" size={24} color="#EF4444" />
-            <Text style={styles.resourceText}>Video hướng dẫn</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#999" />
+            <Text style={[styles.resourceText, { color: colors.text }]}>Video hướng dẫn</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
 

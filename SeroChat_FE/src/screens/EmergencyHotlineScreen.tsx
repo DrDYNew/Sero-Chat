@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Hotline {
   id: number;
@@ -24,6 +25,7 @@ interface Hotline {
 }
 
 const EmergencyHotlineScreen = ({ navigation }: any) => {
+  const { colors, isDarkMode } = useTheme();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   // Fake data cho đường dây khẩn cấp
@@ -150,28 +152,28 @@ const EmergencyHotlineScreen = ({ navigation }: any) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Đường dây khẩn cấp</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Đường dây khẩn cấp</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {/* Alert Banner */}
-      <View style={styles.alertBanner}>
+      <View style={[styles.alertBanner, { backgroundColor: isDarkMode ? '#7F1D1D' : '#FEE2E2' }]}>
         <MaterialCommunityIcons name="alert-circle" size={24} color="#DC2626" />
         <View style={styles.alertTextContainer}>
-          <Text style={styles.alertTitle}>Trong trường hợp khẩn cấp</Text>
-          <Text style={styles.alertText}>
+          <Text style={[styles.alertTitle, { color: isDarkMode ? '#FCA5A5' : '#DC2626' }]}>Trong trường hợp khẩn cấp</Text>
+          <Text style={[styles.alertText, { color: isDarkMode ? '#FCA5A5' : '#991B1B' }]}>
             Nếu bạn hoặc ai đó đang gặp nguy hiểm, vui lòng gọi ngay 115 hoặc đến bệnh viện gần nhất
           </Text>
         </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionTitle}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Các đường dây hỗ trợ tâm lý 24/7
         </Text>
 
@@ -180,7 +182,7 @@ const EmergencyHotlineScreen = ({ navigation }: any) => {
           const categoryInfo = getCategoryLabel(hotline.category);
 
           return (
-            <View key={hotline.id} style={styles.hotlineCard}>
+            <View key={hotline.id} style={[styles.hotlineCard, { backgroundColor: colors.card }]}>
               <TouchableOpacity
                 style={styles.hotlineHeader}
                 onPress={() => toggleExpand(hotline.id)}
@@ -196,14 +198,14 @@ const EmergencyHotlineScreen = ({ navigation }: any) => {
 
                 <View style={styles.hotlineInfo}>
                   <View style={styles.titleRow}>
-                    <Text style={styles.hotlineName} numberOfLines={1}>
+                    <Text style={[styles.hotlineName, { color: colors.text }]} numberOfLines={1}>
                       {hotline.name}
                     </Text>
                     <View style={[styles.categoryBadge, { backgroundColor: categoryInfo.color }]}>
                       <Text style={styles.categoryText}>{categoryInfo.label}</Text>
                     </View>
                   </View>
-                  <Text style={styles.organization} numberOfLines={1}>
+                  <Text style={[styles.organization, { color: colors.textSecondary }]} numberOfLines={1}>
                     {hotline.organization}
                   </Text>
                   <View style={styles.phoneRow}>
@@ -215,19 +217,19 @@ const EmergencyHotlineScreen = ({ navigation }: any) => {
                 <MaterialCommunityIcons
                   name={isExpanded ? 'chevron-up' : 'chevron-down'}
                   size={24}
-                  color="#999"
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
 
               {isExpanded && (
-                <View style={styles.expandedContent}>
+                <View style={[styles.expandedContent, { borderTopColor: isDarkMode ? '#334155' : '#E5E7EB' }]}>
                   <View style={styles.descriptionContainer}>
-                    <Text style={styles.descriptionText}>{hotline.description}</Text>
+                    <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>{hotline.description}</Text>
                   </View>
 
                   <View style={styles.availabilityRow}>
-                    <MaterialCommunityIcons name="clock-outline" size={18} color="#666" />
-                    <Text style={styles.availabilityText}>Thời gian: {hotline.available}</Text>
+                    <MaterialCommunityIcons name="clock-outline" size={18} color={colors.textSecondary} />
+                    <Text style={[styles.availabilityText, { color: colors.textSecondary }]}>Thời gian: {hotline.available}</Text>
                   </View>
 
                   <TouchableOpacity
@@ -244,9 +246,9 @@ const EmergencyHotlineScreen = ({ navigation }: any) => {
         })}
 
         {/* Warning Footer */}
-        <View style={styles.warningFooter}>
-          <MaterialCommunityIcons name="information" size={20} color="#6B7280" />
-          <Text style={styles.warningText}>
+        <View style={[styles.warningFooter, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4F6' }]}>
+          <MaterialCommunityIcons name="information" size={20} color={colors.textSecondary} />
+          <Text style={[styles.warningText, { color: colors.textSecondary }]}>
             Tất cả các cuộc gọi đều được bảo mật và không tốn phí. Đừng ngần ngại liên hệ khi bạn cần hỗ trợ.
           </Text>
         </View>

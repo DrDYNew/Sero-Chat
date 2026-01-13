@@ -14,9 +14,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { chatService, Conversation } from '../services/chatService';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../contexts/ThemeContext';
 
 const ConversationHistoryScreen = () => {
   const navigation = useNavigation<any>();
+  const { colors, isDarkMode } = useTheme();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -97,24 +99,24 @@ const ConversationHistoryScreen = () => {
 
   const renderConversationItem = ({ item }: { item: Conversation }) => (
     <TouchableOpacity
-      style={styles.conversationCard}
+      style={[styles.conversationCard, { backgroundColor: colors.card }]}
       onPress={() => handleSelectConversation(item.convId, item.title)}
       activeOpacity={0.7}
     >
-      <View style={styles.conversationIcon}>
-        <MaterialCommunityIcons name="chat-processing" size={24} color="#667EEA" />
+      <View style={[styles.conversationIcon, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF' }]}>
+        <MaterialCommunityIcons name="chat-processing" size={24} color={colors.primary} />
       </View>
       
       <View style={styles.conversationContent}>
-        <Text style={styles.conversationTitle} numberOfLines={1}>
+        <Text style={[styles.conversationTitle, { color: colors.text }]} numberOfLines={1}>
           {item.title}
         </Text>
         {item.lastMessage && (
-          <Text style={styles.conversationLastMessage} numberOfLines={2}>
+          <Text style={[styles.conversationLastMessage, { color: colors.textSecondary }]} numberOfLines={2}>
             {item.lastMessage}
           </Text>
         )}
-        <Text style={styles.conversationDate}>
+        <Text style={[styles.conversationDate, { color: colors.textSecondary }]}>
           {formatDate(item.lastMessageTime || item.createdAt)}
         </Text>
       </View>
@@ -131,9 +133,9 @@ const ConversationHistoryScreen = () => {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <MaterialCommunityIcons name="chat-outline" size={80} color="#CCC" />
-      <Text style={styles.emptyTitle}>Chưa có lịch sử trò chuyện</Text>
-      <Text style={styles.emptySubtitle}>
+      <MaterialCommunityIcons name="chat-outline" size={80} color={isDarkMode ? '#334155' : '#CCC'} />
+      <Text style={[styles.emptyTitle, { color: colors.text }]}>Chưa có lịch sử trò chuyện</Text>
+      <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
         Bắt đầu chat với SERO để lưu lại lịch sử
       </Text>
       <TouchableOpacity
@@ -154,29 +156,29 @@ const ConversationHistoryScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB' }]}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Lịch sử trò chuyện</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Lịch sử trò chuyện</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('Chats')}
           style={styles.newChatButton}
         >
-          <MaterialCommunityIcons name="chat-plus" size={24} color="#667EEA" />
+          <MaterialCommunityIcons name="chat-plus" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
       {/* Content */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
-          <Text style={styles.loadingText}>Đang tải lịch sử...</Text>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Đang tải lịch sử...</Text>
         </View>
       ) : (
         <FlatList
@@ -192,8 +194,8 @@ const ConversationHistoryScreen = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#667EEA']}
-              tintColor="#667EEA"
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
           }
           showsVerticalScrollIndicator={false}

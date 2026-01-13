@@ -18,6 +18,7 @@ import RenderHtml from 'react-native-render-html';
 import { exploreService } from '../services/exploreService';
 import blogService from '../services/blogService';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -38,6 +39,7 @@ const BlogDetailScreen = () => {
   const navigation = useNavigation();
   const { blogId } = route.params || {};
   const { user } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   
   console.log('BlogDetailScreen mounted with blogId:', blogId);
   
@@ -139,9 +141,9 @@ const BlogDetailScreen = () => {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#667EEA" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -149,28 +151,28 @@ const BlogDetailScreen = () => {
 
   if (!blog) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.errorContainer}>
-          <MaterialCommunityIcons name="alert-circle" size={64} color="#999" />
-          <Text style={styles.errorText}>Không tìm thấy bài viết</Text>
+          <MaterialCommunityIcons name="alert-circle" size={64} color={colors.textSecondary} />
+          <Text style={[styles.errorText, { color: colors.textSecondary }]}>Không tìm thấy bài viết</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? '#334155' : '#E5E7EB' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#1F2937" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chi tiết bài viết</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Chi tiết bài viết</Text>
         <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
           <MaterialCommunityIcons 
             name={isSaved ? "bookmark" : "bookmark-outline"} 
             size={24} 
-            color={isSaved ? "#667EEA" : "#1F2937"} 
+            color={isSaved ? colors.primary : colors.text} 
           />
         </TouchableOpacity>
       </View>
@@ -191,28 +193,28 @@ const BlogDetailScreen = () => {
         )}
 
         {/* Category Badge */}
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryText}>{blog.categoryName}</Text>
+        <View style={[styles.categoryBadge, { backgroundColor: isDarkMode ? '#1E293B' : '#F3F4FF' }]}>
+          <Text style={[styles.categoryText, { color: colors.primary }]}>{blog.categoryName}</Text>
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>{blog.title}</Text>
+        <Text style={[styles.title, { color: colors.text }]}>{blog.title}</Text>
 
         {/* Meta Info */}
         <View style={styles.metaContainer}>
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name="account-circle" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{blog.authorName}</Text>
+            <MaterialCommunityIcons name="account-circle" size={16} color={colors.textSecondary} />
+            <Text style={[styles.metaText, { color: colors.textSecondary }]}>{blog.authorName}</Text>
           </View>
-          <View style={styles.metaDivider} />
+          <View style={[styles.metaDivider, { backgroundColor: isDarkMode ? '#334155' : '#E5E7EB' }]} />
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{blog.readTime}</Text>
+            <MaterialCommunityIcons name="clock-outline" size={16} color={colors.textSecondary} />
+            <Text style={[styles.metaText, { color: colors.textSecondary }]}>{blog.readTime}</Text>
           </View>
-          <View style={styles.metaDivider} />
+          <View style={[styles.metaDivider, { backgroundColor: isDarkMode ? '#334155' : '#E5E7EB' }]} />
           <View style={styles.metaItem}>
-            <MaterialCommunityIcons name="calendar" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{formatDate(blog.createdAt)}</Text>
+            <MaterialCommunityIcons name="calendar" size={16} color={colors.textSecondary} />
+            <Text style={[styles.metaText, { color: colors.textSecondary }]}>{formatDate(blog.createdAt)}</Text>
           </View>
         </View>
 
@@ -223,19 +225,19 @@ const BlogDetailScreen = () => {
             source={{ html: blog.content }}
             tagsStyles={{
               body: {
-                color: '#374151',
+                color: colors.text,
                 fontSize: 16,
                 lineHeight: 26,
               },
               h2: {
-                color: '#1F2937',
+                color: colors.text,
                 fontSize: 22,
                 fontWeight: 'bold',
                 marginTop: 24,
                 marginBottom: 12,
               },
               h3: {
-                color: '#1F2937',
+                color: colors.text,
                 fontSize: 18,
                 fontWeight: '600',
                 marginTop: 20,

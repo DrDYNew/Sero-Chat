@@ -15,9 +15,11 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useAuth } from '../contexts/AuthContext';
 import { profileService } from '../services/profileService';
+import { useTheme } from '../contexts/ThemeContext';
 
 const ProfileScreen = ({ navigation }: any) => {
   const { user, updateUser } = useAuth();
+  const { colors, isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -147,50 +149,50 @@ const ProfileScreen = ({ navigation }: any) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#e0e0e0' }]}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Thông tin cá nhân</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Thông tin cá nhân</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#8B5CF6" />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: isDarkMode ? colors.card : '#e0e0e0' }]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Thông tin cá nhân</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Thông tin cá nhân</Text>
         {!editing ? (
           <TouchableOpacity onPress={() => setEditing(true)}>
-            <MaterialCommunityIcons name="pencil" size={24} color="#8B5CF6" />
+            <MaterialCommunityIcons name="pencil" size={24} color={colors.primary} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity onPress={handleCancel}>
-            <MaterialCommunityIcons name="close" size={24} color="#666" />
+            <MaterialCommunityIcons name="close" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
         )}
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Avatar Section */}
-        <View style={styles.avatarSection}>
+        <View style={[styles.avatarSection, { backgroundColor: colors.card, borderBottomColor: colors.background }]}>
           {uploadingImage ? (
-            <View style={styles.avatarPlaceholder}>
-              <ActivityIndicator size="large" color="#8B5CF6" />
+            <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
+              <ActivityIndicator size="large" color="#FFF" />
             </View>
           ) : formData.avatarUrl ? (
             <Image source={{ uri: formData.avatarUrl }} style={styles.avatar} />
           ) : (
-            <View style={styles.avatarPlaceholder}>
+            <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
               <Text style={styles.avatarText}>
                 {formData.fullName?.charAt(0)?.toUpperCase() || 
                  user?.email?.charAt(0)?.toUpperCase() || 'U'}
@@ -198,7 +200,7 @@ const ProfileScreen = ({ navigation }: any) => {
             </View>
           )}
           <TouchableOpacity 
-            style={styles.changeAvatarButton}
+            style={[styles.changeAvatarButton, { backgroundColor: colors.primary }]}
             onPress={pickImage}
             disabled={uploadingImage}
           >
@@ -207,52 +209,52 @@ const ProfileScreen = ({ navigation }: any) => {
         </View>
 
         {/* Form Fields */}
-        <View style={styles.formSection}>
+        <View style={[styles.formSection, { backgroundColor: colors.card }]}>
           {/* Email (không thể chỉnh sửa) */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Email</Text>
-            <View style={[styles.input, styles.disabledInput]}>
-              <MaterialCommunityIcons name="email" size={20} color="#999" />
-              <Text style={styles.disabledText}>{user?.email}</Text>
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Email</Text>
+            <View style={[styles.input, styles.disabledInput, { backgroundColor: isDarkMode ? '#1F2937' : '#f0f0f0' }]}>
+              <MaterialCommunityIcons name="email" size={20} color={colors.textSecondary} />
+              <Text style={[styles.disabledText, { color: colors.textSecondary }]}>{user?.email}</Text>
             </View>
           </View>
 
           {/* Họ và tên */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Họ và tên</Text>
-            <View style={styles.input}>
-              <MaterialCommunityIcons name="account" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Họ và tên</Text>
+            <View style={[styles.input, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa' }]}>
+              <MaterialCommunityIcons name="account" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.fullName}
                 onChangeText={(text) => setFormData({ ...formData, fullName: text })}
                 placeholder="Nhập họ và tên"
                 editable={editing}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
           </View>
 
           {/* Số điện thoại */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Số điện thoại</Text>
-            <View style={styles.input}>
-              <MaterialCommunityIcons name="phone" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Số điện thoại</Text>
+            <View style={[styles.input, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa' }]}>
+              <MaterialCommunityIcons name="phone" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.phoneNumber}
                 onChangeText={(text) => setFormData({ ...formData, phoneNumber: text })}
                 placeholder="Nhập số điện thoại"
                 keyboardType="phone-pad"
                 editable={editing}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
           </View>
 
           {/* Giới tính */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Giới tính</Text>
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Giới tính</Text>
             {editing ? (
               <View style={styles.genderContainer}>
                 {['Nam', 'Nữ', 'Khác'].map((gender) => (
@@ -260,13 +262,15 @@ const ProfileScreen = ({ navigation }: any) => {
                     key={gender}
                     style={[
                       styles.genderButton,
-                      formData.gender === gender && styles.genderButtonActive,
+                      { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa', borderColor: isDarkMode ? '#374151' : '#e0e0e0' },
+                      formData.gender === gender && [styles.genderButtonActive, { backgroundColor: colors.primary, borderColor: colors.primary }],
                     ]}
                     onPress={() => setFormData({ ...formData, gender })}
                   >
                     <Text
                       style={[
                         styles.genderText,
+                        { color: colors.textSecondary },
                         formData.gender === gender && styles.genderTextActive,
                       ]}
                     >
@@ -276,25 +280,25 @@ const ProfileScreen = ({ navigation }: any) => {
                 ))}
               </View>
             ) : (
-              <View style={styles.input}>
-                <MaterialCommunityIcons name="gender-male-female" size={20} color="#666" />
-                <Text style={styles.displayText}>{formData.gender || 'Chưa cập nhật'}</Text>
+              <View style={[styles.input, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa' }]}>
+                <MaterialCommunityIcons name="gender-male-female" size={20} color={colors.textSecondary} />
+                <Text style={[styles.displayText, { color: colors.textSecondary }]}>{formData.gender || 'Chưa cập nhật'}</Text>
               </View>
             )}
           </View>
 
           {/* Ngày sinh */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.fieldLabel}>Ngày sinh</Text>
-            <View style={styles.input}>
-              <MaterialCommunityIcons name="calendar" size={20} color="#666" />
+            <Text style={[styles.fieldLabel, { color: colors.text }]}>Ngày sinh</Text>
+            <View style={[styles.input, { backgroundColor: isDarkMode ? '#1F2937' : '#f8f9fa' }]}>
+              <MaterialCommunityIcons name="calendar" size={20} color={colors.textSecondary} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 value={formData.dateOfBirth}
                 onChangeText={(text) => setFormData({ ...formData, dateOfBirth: text })}
                 placeholder="YYYY-MM-DD"
                 editable={editing}
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
           </View>
@@ -302,15 +306,15 @@ const ProfileScreen = ({ navigation }: any) => {
 
         {/* Action Buttons */}
         {editing && (
-          <View style={styles.actionButtons}>
+          <View style={[styles.actionButtons, { backgroundColor: colors.card }]}>
             <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
+              style={[styles.button, styles.cancelButton, { backgroundColor: isDarkMode ? '#374151' : '#f0f0f0' }]}
               onPress={handleCancel}
             >
-              <Text style={styles.cancelButtonText}>Hủy</Text>
+              <Text style={[styles.cancelButtonText, { color: colors.text }]}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.saveButton]}
+              style={[styles.button, styles.saveButton, { backgroundColor: colors.primary }]}
               onPress={handleSave}
               disabled={saving}
             >
@@ -324,18 +328,18 @@ const ProfileScreen = ({ navigation }: any) => {
         )}
 
         {/* Additional Options */}
-        <View style={styles.optionsSection}>
+        <View style={[styles.optionsSection, { backgroundColor: colors.card }]}>
           <TouchableOpacity
-            style={styles.optionItem}
+            style={[styles.optionItem, { borderBottomColor: isDarkMode ? '#374151' : '#f0f0f0' }]}
             onPress={() => navigation.navigate('ChangePassword')}
           >
             <View style={styles.optionLeft}>
-              <View style={[styles.optionIcon, { backgroundColor: '#FEF3C7' }]}>
+              <View style={[styles.optionIcon, { backgroundColor: isDarkMode ? '#3F2A0A' : '#FEF3C7' }]}>
                 <MaterialCommunityIcons name="lock-reset" size={24} color="#F59E0B" />
               </View>
-              <Text style={styles.optionText}>Đổi mật khẩu</Text>
+              <Text style={[styles.optionText, { color: colors.text }]}>Đổi mật khẩu</Text>
             </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#ccc" />
+            <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </ScrollView>

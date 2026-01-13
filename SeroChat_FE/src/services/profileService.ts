@@ -75,4 +75,81 @@ export const profileService = {
       throw error;
     }
   },
+
+  // Lấy thông tin profile
+  getProfile: async (userId: number) => {
+    try {
+      const response = await api.get(`/profile/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      console.log('Error loading profile:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // Cập nhật profile
+  updateProfile: async (userId: number, data: {
+    fullName?: string;
+    phoneNumber?: string;
+    gender?: string;
+    dateOfBirth?: string;
+    avatarUrl?: string;
+  }) => {
+    try {
+      const response = await api.put(`/profile/${userId}`, data);
+      return response.data;
+    } catch (error: any) {
+      console.log('Error updating profile:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // Đổi mật khẩu
+  changePassword: async (userId: number, oldPassword: string, newPassword: string) => {
+    try {
+      const response = await api.post(`/profile/${userId}/change-password`, {
+        oldPassword,
+        newPassword,
+      });
+      return response.data;
+    } catch (error: any) {
+      console.log('Error changing password:', error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  // Upload avatar
+  uploadAvatar: async (userId: number, imageUri: string) => {
+    try {
+      // Tạo FormData
+      const formData = new FormData();
+      const filename = imageUri.split('/').pop();
+      const match = /\.(\w+)$/.exec(filename || '');
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('file', {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      } as any);
+
+      // Gửi request với multipart/form-data
+      const token = await AsyncStorage.getItem('authToken');
+      const response = await axios.post(
+        `${API_BASE_URL}/profile/${userId}/upload-avatar`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.log('Error uploading avatar:', error.response?.data || error.message);
+      throw error;
+    }
+  },
 };

@@ -15,10 +15,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { exploreService, Blog, BlogCategory } from '../services/exploreService';
+import blogService from '../services/blogService';
+import { useAuth } from '../contexts/AuthContext';
 import BottomTabBar from '../components/BottomTabBar';
 
 const ExploreScreen = () => {
   const navigation = useNavigation<any>();
+  const { user } = useAuth();
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -106,14 +109,25 @@ const ExploreScreen = () => {
     </ScrollView>
   );
 
-  const renderBlogCard = ({ item }: { item: Blog }) => (
-    <TouchableOpacity
-      style={styles.blogCard}
-      onPress={() => {
-        navigation.navigate('BlogDetail', { blogId: item.blogId });
-      }}
-      activeOpacity={0.7}
-    >
+  const renderBlogCard = ({ item }: { item: Blog }) => {
+    const handleBlogPress = async () => {
+      // Đánh dấu đã đọc nếu user đã đăng nhập
+      if (user?.id) {
+        try {
+          await blogService.markAsRead(user.id, item.blogId);
+        } catch (error) {
+          console.log('Error marking as read:', error);
+        }
+      }
+      navigation.navigate('BlogDetail', { blogId: item.blogId });
+    };
+
+    return (
+      <TouchableOpacity
+        style={styles.blogCard}
+        onPress={handleBlogPress}
+        activeOpacity={0.7}
+      >
       {item.thumbnailUrl ? (
         <Image source={{ uri: item.thumbnailUrl }} style={styles.blogImage} />
       ) : (
@@ -152,7 +166,8 @@ const ExploreScreen = () => {
         </View>
       </View>
     </TouchableOpacity>
-  );
+    );
+  };
 
   if (isLoading && !isRefreshing) {
     return (

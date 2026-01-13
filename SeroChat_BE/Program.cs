@@ -69,6 +69,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IPayOSService, PayOSService>();
 builder.Services.AddScoped<IChatLimitService, ChatLimitService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");

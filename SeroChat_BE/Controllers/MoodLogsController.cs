@@ -95,6 +95,27 @@ namespace SeroChat_BE.Controllers
                 _context.MoodLogs.Add(moodLog);
                 await _context.SaveChangesAsync();
 
+                // Tạo notification
+                var moodEmoji = request.MoodScore switch
+                {
+                    5 => "😊",
+                    4 => "🙂",
+                    3 => "😐",
+                    2 => "😟",
+                    1 => "😢",
+                    _ => "😐"
+                };
+                var notification = new Notification
+                {
+                    UserId = userId,
+                    Title = "Đã ghi nhận tâm trạng",
+                    Content = $"Tâm trạng hôm nay của bạn: {moodEmoji} ({request.MoodScore}/5)",
+                    IsRead = false,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+
                 return Ok(new
                 {
                     success = true,

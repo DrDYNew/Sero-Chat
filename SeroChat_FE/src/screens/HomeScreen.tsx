@@ -17,6 +17,7 @@ import { useAuth } from '../contexts/AuthContext';
 import BottomTabBar from '../components/BottomTabBar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { moodService } from '../services/moodService';
+import { notificationService } from '../services/notificationService';
 import {
   getDailyAffirmation,
   getRelaxAssets,
@@ -69,11 +70,27 @@ const HomeScreen = () => {
   const [relaxAssets, setRelaxAssets] = useState<RelaxAsset[]>([]);
   const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
   const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Fetch data from API
   useEffect(() => {
     loadHomeData();
+    if (user?.id) {
+      loadUnreadCount();
+    }
   }, []);
+
+  const loadUnreadCount = async () => {
+    try {
+      if (!user?.id) return;
+      const response = await notificationService.getUnreadCount(parseInt(user.id));
+      if (response.success) {
+        setUnreadCount(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.log('Error loading unread count:', error);
+    }
+  };
 
   const loadHomeData = async () => {
     try {
@@ -310,12 +327,18 @@ const HomeScreen = () => {
             </Text>
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => navigation.navigate('Notification')}
+            >
               <MaterialCommunityIcons name="bell-outline" size={24} color="#333" />
-              {user?.id && <View style={styles.notificationDot} />}
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <MaterialCommunityIcons name="cog-outline" size={24} color="#333" />
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -719,16 +742,24 @@ const styles = StyleSheet.create({
     elevation: 2,
     position: 'relative',
   },
-  notificationDot: {
+  notificationBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: 6,
+    right: 6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
     borderWidth: 2,
     borderColor: '#FFF',
+  },
+  notificationBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   
   // Hero Section

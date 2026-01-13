@@ -14,6 +14,14 @@ import BlogDetailScreen from './src/screens/BlogDetailScreen';
 import MenuScreen from './src/screens/MenuScreen';
 import AdminDashboard from './src/screens/AdminDashboard';
 import ManageUsersScreen from './src/screens/ManageUsersScreen';
+import ManageDoctorsScreen from './src/screens/ManageDoctorsScreen';
+import AddDoctorScreen from './src/screens/AddDoctorScreen';
+import EditDoctorScreen from './src/screens/EditDoctorScreen';
+import DoctorDetailAdminScreen from './src/screens/DoctorDetailAdminScreen';
+import ManageRelaxScreen from './src/screens/ManageRelaxScreen';
+import AddRelaxAssetScreen from './src/screens/AddRelaxAssetScreen';
+import EditRelaxAssetScreen from './src/screens/EditRelaxAssetScreen';
+import RelaxDetailAdminScreen from './src/screens/RelaxDetailAdminScreen';
 import UserDetailScreen from './src/screens/UserDetailScreen';
 import AddEditUserScreen from './src/screens/AddEditUserScreen';
 import ManageSubscriptionPlansScreen from './src/screens/ManageSubscriptionPlansScreen';
@@ -24,6 +32,17 @@ import PaymentQRScreen from './src/screens/PaymentQRScreen';
 import ManageBlogsScreen from './src/screens/ManageBlogsScreen';
 import AdminBlogDetailScreen from './src/screens/AdminBlogDetailScreen';
 import AddEditBlogScreen from './src/screens/AddEditBlogScreen';
+import SavedBlogsScreen from './src/screens/SavedBlogsScreen';
+import ReadHistoryScreen from './src/screens/ReadHistoryScreen';
+import DoctorListScreen from './src/screens/DoctorListScreen';
+import DoctorDetailScreen from './src/screens/DoctorDetailScreen';
+import EmergencyHotlineScreen from './src/screens/EmergencyHotlineScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import ChangePasswordScreen from './src/screens/ChangePasswordScreen';
+import PrivacySettingsScreen from './src/screens/PrivacySettingsScreen';
+import HelpSupportScreen from './src/screens/HelpSupportScreen';
+import AboutScreen from './src/screens/AboutScreen';
+import NotificationScreen from './src/screens/NotificationScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 
 const Stack = createNativeStackNavigator();
@@ -50,6 +69,14 @@ export default function App() {
           <Stack.Screen name="Explore" component={ExploreScreen} />
           <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
           <Stack.Screen name="AdminDashboard" component={AdminDashboard} />
+          <Stack.Screen name="ManageDoctors" component={ManageDoctorsScreen} />
+          <Stack.Screen name="AddDoctor" component={AddDoctorScreen} />
+          <Stack.Screen name="EditDoctor" component={EditDoctorScreen} />
+          <Stack.Screen name="DoctorDetailAdmin" component={DoctorDetailAdminScreen} />
+          <Stack.Screen name="ManageRelax" component={ManageRelaxScreen} />
+          <Stack.Screen name="AddRelaxAsset" component={AddRelaxAssetScreen} />
+          <Stack.Screen name="EditRelaxAsset" component={EditRelaxAssetScreen} />
+          <Stack.Screen name="RelaxDetailAdmin" component={RelaxDetailAdminScreen} />
           <Stack.Screen name="ManageUsers" component={ManageUsersScreen} />
           <Stack.Screen name="UserDetail" component={UserDetailScreen} />
           <Stack.Screen name="AddEditUser" component={AddEditUserScreen} />
@@ -61,6 +88,17 @@ export default function App() {
           <Stack.Screen name="ManageBlogs" component={ManageBlogsScreen} />
           <Stack.Screen name="AdminBlogDetail" component={AdminBlogDetailScreen} />
           <Stack.Screen name="AddEditBlog" component={AddEditBlogScreen} />
+          <Stack.Screen name="SavedBlogs" component={SavedBlogsScreen} />
+          <Stack.Screen name="ReadHistory" component={ReadHistoryScreen} />
+          <Stack.Screen name="DoctorList" component={DoctorListScreen} />
+          <Stack.Screen name="DoctorDetail" component={DoctorDetailScreen} />
+          <Stack.Screen name="EmergencyHotline" component={EmergencyHotlineScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+          <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} />
+          <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
+          <Stack.Screen name="About" component={AboutScreen} />
+          <Stack.Screen name="Notification" component={NotificationScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>

@@ -9,12 +9,15 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import RenderHtml from 'react-native-render-html';
 import { exploreService } from '../services/exploreService';
+import blogService from '../services/blogService';
+import { useAuth } from '../contexts/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -34,21 +37,27 @@ const BlogDetailScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
   const { blogId } = route.params || {};
+  const { user } = useAuth();
   
   console.log('BlogDetailScreen mounted with blogId:', blogId);
   
   const [blog, setBlog] = useState<BlogDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (blogId) {
       loadBlogDetail();
+      if (user?.id) {
+        checkIfSaved();
+        markAsRead();
+      }
     } else {
       console.error('No blogId provided');
       setIsLoading(false);
     }
-  }, [blogId]);
+  }, [blogId, user]);
 
   const loadBlogDetail = async () => {
     try {
@@ -62,6 +71,28 @@ const BlogDetailScreen = () => {
       console.error('Error details:', JSON.stringify(error));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkIfSaved = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await blogService.isBlogSaved(user.id, blogId);
+      if (response.success) {
+        setIsSaved(response.isSaved);
+      }
+    } catch (error) {
+      console.log('Error checking if saved:', error);
+    }
+  };
+
+  const markAsRead = async () => {
+    if (!user?.id) return;
+    try {
+      await blogService.markAsRead(user.id, blogId);
+      console.log('Marked as read');
+    } catch (error) {
+      console.log('Error marking as read:', error);
     }
   };
 
@@ -79,9 +110,31 @@ const BlogDetailScreen = () => {
     return date.toLocaleDateString('vi-VN');
   };
 
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-    // TODO: Implement save to database
+  const handleSave = async () => {
+    if (!user?.id) {
+      Alert.alert('Thông báo', 'Vui lòng đăng nhập để lưu bài viết');
+      return;
+    }
+
+    if (isSaving) return;
+
+    try {
+      setIsSaving(true);
+      if (isSaved) {
+        await blogService.unsaveBlog(user.id, blogId);
+        setIsSaved(false);
+        Alert.alert('Thành công', 'Đã bỏ lưu bài viết');
+      } else {
+        await blogService.saveBlog(user.id, blogId);
+        setIsSaved(true);
+        Alert.alert('Thành công', 'Đã lưu bài viết');
+      }
+    } catch (error: any) {
+      console.error('Error saving blog:', error);
+      Alert.alert('Lỗi', error.message || 'Không thể lưu bài viết');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {

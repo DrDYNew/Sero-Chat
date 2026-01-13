@@ -180,6 +180,116 @@ const blogService = {
 
     return await response.json();
   },
+
+  // Lấy danh sách blog đã lưu
+  getSavedBlogs: async (userId: number): Promise<ApiResponse<BlogListItem[]>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/saved/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch saved blogs');
+    }
+
+    return await response.json();
+  },
+
+  // Lưu blog
+  saveBlog: async (userId: number, blogId: number): Promise<ApiResponse<any>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/save`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, blogId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save blog');
+    }
+
+    return await response.json();
+  },
+
+  // Bỏ lưu blog
+  unsaveBlog: async (userId: number, blogId: number): Promise<ApiResponse<any>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/unsave/${userId}/${blogId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to unsave blog');
+    }
+
+    return await response.json();
+  },
+
+  // Lấy lịch sử đọc
+  getReadHistory: async (userId: number): Promise<ApiResponse<BlogListItem[]>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/history/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch read history');
+    }
+
+    return await response.json();
+  },
+
+  // Đánh dấu đã đọc
+  markAsRead: async (userId: number, blogId: number): Promise<ApiResponse<any>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/mark-read`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId, blogId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to mark as read');
+    }
+
+    return await response.json();
+  },
+
+  // Kiểm tra blog đã lưu chưa
+  isBlogSaved: async (userId: number, blogId: number): Promise<ApiResponse<{ isSaved: boolean }>> => {
+    const token = await AsyncStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/Blogs/is-saved/${userId}/${blogId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to check if blog is saved');
+    }
+
+    return await response.json();
+  },
 };
 
 export default blogService;

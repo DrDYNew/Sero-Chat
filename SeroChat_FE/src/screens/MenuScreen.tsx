@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
 import { profileService } from '../services/profileService';
+import { notificationService } from '../services/notificationService';
 
 const MenuScreen = ({ navigation }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -23,10 +24,12 @@ const MenuScreen = ({ navigation }) => {
     savedBlogs: 0,
     moodLogs: 0,
   });
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
       loadUserStats();
+      loadUnreadNotifications();
     }
   }, [isAuthenticated, user]);
 
@@ -45,6 +48,17 @@ const MenuScreen = ({ navigation }) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUnreadNotifications = async () => {
+    try {
+      const response = await notificationService.getUnreadCount(parseInt(user.id));
+      if (response.success) {
+        setUnreadNotifications(response.data.unreadCount);
+      }
+    } catch (error) {
+      console.log('Error loading unread notifications:', error);
     }
   };
 
@@ -210,7 +224,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Các bài viết bạn quan tâm',
       color: '#EC4899', 
       badge: stats.savedBlogs > 0 ? stats.savedBlogs : null,
-      route: 'NotFound'
+      route: 'SavedBlogs'
     },
     { 
       icon: 'history', 
@@ -218,7 +232,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Blog đã xem gần đây',
       color: '#6366F1', 
       badge: null,
-      route: 'NotFound'
+      route: 'ReadHistory'
     },
   ];
 
@@ -229,7 +243,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Kết nối với bác sĩ tâm lý',
       color: '#14B8A6', 
       badge: null,
-      route: 'NotFound'
+      route: 'DoctorList'
     },
     { 
       icon: 'phone-alert', 
@@ -237,7 +251,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Hỗ trợ 24/7 khi cần thiết',
       color: '#EF4444', 
       badge: null,
-      route: 'NotFound'
+      route: 'EmergencyHotline'
     },
   ];
 
@@ -256,7 +270,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Chỉnh sửa họ tên, email, số điện thoại',
       color: '#6B7280', 
       badge: null,
-      route: 'NotFound'
+      route: 'Profile'
     },
     { 
       icon: 'lock-reset', 
@@ -264,7 +278,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Bảo mật tài khoản',
       color: '#6B7280', 
       badge: null,
-      route: 'NotFound'
+      route: 'ChangePassword'
     },
     { 
       icon: 'shield-check', 
@@ -272,15 +286,15 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Quản lý dữ liệu cá nhân',
       color: '#6B7280', 
       badge: null,
-      route: 'NotFound'
+      route: 'PrivacySettings'
     },
     { 
       icon: 'bell-outline', 
       title: 'Thông báo', 
       subtitle: 'Cài đặt nhắc nhở và thông báo',
       color: '#6B7280', 
-      badge: null,
-      route: 'NotFound'
+      badge: unreadNotifications > 0 ? unreadNotifications : null,
+      route: 'Notification'
     },
     { 
       icon: 'help-circle', 
@@ -288,7 +302,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Câu hỏi thường gặp',
       color: '#6B7280', 
       badge: null,
-      route: 'NotFound'
+      route: 'HelpSupport'
     },
     { 
       icon: 'information', 
@@ -296,7 +310,7 @@ const MenuScreen = ({ navigation }) => {
       subtitle: 'Phiên bản 1.0.0',
       color: '#6B7280', 
       badge: null,
-      route: 'NotFound'
+      route: 'About'
     },
   ];
 
@@ -324,6 +338,21 @@ const MenuScreen = ({ navigation }) => {
             {renderUserCard()}
             {renderStatsCard()}
 
+            {/* Admin Section */}
+            {isAuthenticated && user?.role === 'ADMIN' && (
+              <>
+                {renderSectionTitle('Quản trị hệ thống')}
+                {renderMenuItem(
+                  'view-dashboard',
+                  'Dashboard Admin',
+                  'Quản lý và thống kê hệ thống',
+                  '#7C3AED',
+                  null,
+                  () => navigation.navigate('AdminDashboard')
+                )}
+              </>
+            )}
+
             {isAuthenticated && (
               <>
                 {renderSectionTitle('Sức khỏe tâm lý')}
@@ -349,7 +378,7 @@ const MenuScreen = ({ navigation }) => {
                       item.subtitle,
                       item.color,
                       item.badge,
-                      () => navigation.navigate(item.route, { featureName: item.title })
+                      () => navigation.navigate(item.route)
                     )}
                   </View>
                 ))}
@@ -363,7 +392,7 @@ const MenuScreen = ({ navigation }) => {
                       item.subtitle,
                       item.color,
                       item.badge,
-                      () => navigation.navigate(item.route, { featureName: item.title })
+                      () => navigation.navigate(item.route)
                     )}
                   </View>
                 ))}
@@ -379,7 +408,13 @@ const MenuScreen = ({ navigation }) => {
                   item.subtitle,
                   item.color,
                   item.badge,
-                  () => navigation.navigate(item.route, { featureName: item.title })
+                  () => {
+                    if (item.route === 'NotFound') {
+                      navigation.navigate(item.route, { featureName: item.title });
+                    } else {
+                      navigation.navigate(item.route);
+                    }
+                  }
                 )}
               </View>
             ))}

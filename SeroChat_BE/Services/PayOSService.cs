@@ -234,6 +234,17 @@ namespace SeroChat_BE.Services
                     user.SubscriptionStatus = "PREMIUM";
                     user.PremiumExpiry = transaction.EndDate;
 
+                    // Tạo notification
+                    var notification = new Notification
+                    {
+                        UserId = user.UserId,
+                        Title = "Nâng cấp Premium thành công",
+                        Content = $"Chúc mừng! Bạn đã nâng cấp gói {transaction.Plan.PlanName}. Hạn sử dụng đến {transaction.EndDate?.ToString("dd/MM/yyyy")}",
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    };
+                    _context.Notifications.Add(notification);
+
                     await _context.SaveChangesAsync();
 
                     _logger.LogInformation($"Payment successful for order: {webhookData.OrderCode}");

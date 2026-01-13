@@ -18,6 +18,7 @@ interface AuthContextType {
   loading: boolean;
   login: (userData: User) => void;
   logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,8 +77,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const updateUser = async (userData: Partial<User>) => {
+    try {
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      
+      // Cập nhật AsyncStorage
+      const storedData = await AsyncStorage.getItem('userData');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        const newData = {
+          ...parsedData,
+          fullName: updatedUser.fullName,
+          avatarUrl: updatedUser.avatarUrl,
+          email: updatedUser.email,
+        };
+        await AsyncStorage.setItem('userData', JSON.stringify(newData));
+      }
+    } catch (error) {
+      console.log('Error updating user:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
